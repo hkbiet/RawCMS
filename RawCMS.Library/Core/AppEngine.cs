@@ -1,5 +1,7 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using McMaster.NETCore.Plugins;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 using RawCMS.Library.Core.Extension;
 using RawCMS.Library.Core.Interfaces;
 using RawCMS.Library.DataModel;
@@ -135,6 +137,10 @@ namespace RawCMS.Library.Core
             _logger.LogDebug("Get all assembly");
             List<string> dlls = new List<string>();
             dlls.AddRange(Directory.GetFiles(searchFolder, "*.dll", SearchOption.AllDirectories));
+            //Naming convention: Can be improved
+              dlls = dlls.Where(x => x.Contains("RawCMS.Plugins")).ToList();
+
+            dlls.RemoveAll(x => x.Contains("RawCMS.Library"));
 
             for (int i = 0; i < dlls.Count; i++)
             {
@@ -153,14 +159,20 @@ namespace RawCMS.Library.Core
                 dlls.ForEach(x => {
                     
                         _logger.LogInformation("Loading plugin from: {0}", x);
-                    try
-                    {
-                        AssemblyLoadContext.Default.LoadFromAssemblyPath(x);
-                    }
-                    catch (Exception err)
-                    {
-                        _logger.LogWarning("unable to load {0}", x);
-                    }
+                    //try
+                    //{
+                        if (File.Exists(x))
+                        {
+                            var loader = PluginLoader.CreateFromAssemblyFile(
+                                x,
+                                sharedTypes: new Type[] { typeof(Plugin) , typeof(ILogger),typeof(JObject)});
+                               loader.LoadDefaultAssembly();
+                        }
+                    //}
+                    //catch (Exception err)
+                    //{
+                    //    _logger.LogWarning("unable to load {0}", x);
+                    //}
                 });
             
         }
