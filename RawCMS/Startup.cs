@@ -6,28 +6,36 @@ using Microsoft.Extensions.Logging;
 using NLog.Extensions.Logging;
 using NLog.Web;
 using RawCMS.Library.Core;
-using RawCMS.Plugins.Core;
 using Swashbuckle.AspNetCore.Swagger;
 using System.Linq;
+using System.Runtime.Loader;
 
 namespace RawCMS
 {
     public class Startup
     {
-        private readonly CorePlugin cp = new CorePlugin();
+        //private readonly CorePlugin cp = new CorePlugin();
 
         //TODO: this forces module reload. Fix it to avoid this manual step.
-        private readonly AuthPlugin dd = new AuthPlugin();
+        //private readonly AuthPlugin dd = new AuthPlugin();
 
         private readonly ILogger logger;
         private readonly ILoggerFactory loggerFactory;
         private AppEngine appEngine;
+        
 
         public Startup(IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+            
+
             this.loggerFactory = loggerFactory;
             loggerFactory.AddConsole(LogLevel.Trace);
             logger = loggerFactory.CreateLogger(typeof(Startup));
+
+            // loggerFactory.AddConsole(Configuration.GetSection("Logging"));
+            loggerFactory.AddDebug();
+            loggerFactory.AddNLog();
+            env.ConfigureNLog(".\\conf\\nlog.config");
 
             IConfigurationBuilder builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
@@ -42,10 +50,7 @@ namespace RawCMS
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            // loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-            loggerFactory.AddDebug();
-            loggerFactory.AddNLog();
-            env.ConfigureNLog(".\\conf\\nlog.config");
+            
 
             if (env.IsDevelopment())
             {
@@ -81,7 +86,7 @@ namespace RawCMS
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            appEngine = new AppEngine(loggerFactory);
+            appEngine = new AppEngine(loggerFactory, Configuration);
 
             appEngine.Plugins.OrderBy(x => x.Priority).ToList().ForEach(x =>
             {

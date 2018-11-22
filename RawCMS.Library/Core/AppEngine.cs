@@ -1,12 +1,15 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using RawCMS.Library.Core.Extension;
 using RawCMS.Library.Core.Interfaces;
+using RawCMS.Library.DataModel;
 using RawCMS.Library.Service;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Loader;
 
 namespace RawCMS.Library.Core
 {
@@ -15,6 +18,9 @@ namespace RawCMS.Library.Core
         //#region singleton
         //private static LambdaManager _current = null;
         private static ILogger _logger;
+        private IConfigurationRoot config;
+        private AppSettings appSettings=new AppSettings();
+       
 
         private ILoggerFactory loggerFactory;
 
@@ -56,12 +62,15 @@ namespace RawCMS.Library.Core
         //    }
         //}
 
-        public AppEngine(ILoggerFactory loggerFactory)
+        public AppEngine(ILoggerFactory loggerFactory, IConfigurationRoot config)
         {
             _logger = loggerFactory.CreateLogger(typeof(AppEngine));
             this.loggerFactory = loggerFactory;
-
-            LoadAllAssembly();
+            this.config = config;
+            
+            this.config.GetSection("RawCms").Bind(this.appSettings);
+            _logger.LogInformation("Settings loaded {0}", this.appSettings!=null);
+            PreloadAllAssembly();
             LoadPlugins();
         }
 
@@ -99,11 +108,38 @@ namespace RawCMS.Library.Core
             DiscoverLambdasInBundle();
         }
 
-        public List<string> GetAllAssembly()
+        public void PreloadAllAssembly()
+        {           
+                PreloadBinDll();
+                PreloadPluginDir();
+        }
+
+        public void PreloadPluginDir()
         {
+            PreloadFromDir( Path.Combine(Path.GetDirectoryName(this.GetType().Assembly.Location),"Plugins"));
+            PreloadFromDir(Path.Combine(Directory.GetParent(Path.GetDirectoryName(this.GetType().Assembly.Location)).FullName, "Plugins"));
+            foreach (var folder in appSettings.PluginFolders)
+            {
+
+                PreloadFromDir(new DirectoryInfo(folder).FullName);
+            }
+        }
+        private void PreloadBinDll()
+        {
+            PreloadFromDir(Path.GetDirectoryName(this.GetType().Assembly.Location));
+        }
+
+        private void PreloadFromDir(string searchFolder)
+        {
+            if (!Directory.Exists(searchFolder)) return;
             _logger.LogDebug("Get all assembly");
             List<string> dlls = new List<string>();
-            dlls.AddRange(Directory.GetFiles(".\\bin", "*.dll", SearchOption.AllDirectories));
+            dlls.AddRange(Directory.GetFiles(searchFolder, "*.dll", SearchOption.AllDirectories));
+
+            for (int i = 0; i < dlls.Count; i++)
+            {
+                dlls[i] = new FileInfo(dlls[i]).FullName;
+            }
 
             if (_logger.IsEnabled(LogLevel.Debug))
             {
@@ -112,24 +148,24 @@ namespace RawCMS.Library.Core
                     _logger.LogDebug("Plugin enabled {0}", x);
                 });
             }
-            return dlls;
+
+           
+                dlls.ForEach(x => {
+                    
+                        _logger.LogInformation("Loading plugin from: {0}", x);
+                    try
+                    {
+                        AssemblyLoadContext.Default.LoadFromAssemblyPath(x);
+                    }
+                    catch (Exception err)
+                    {
+                        _logger.LogWarning("unable to load {0}", x);
+                    }
+                });
+            
         }
 
-        public void LoadAllAssembly()
-        {
-            //foreach (var type in Assembly.GetExecutingAssembly().GetTypes())
-            //{
-            //    foreach (var method in type.GetMethods(BindingFlags.DeclaredOnly |
-            //                        BindingFlags.NonPublic |
-            //                        BindingFlags.Public | BindingFlags.Instance |
-            //                        BindingFlags.Static))
-            //    {
-            //        System.Runtime.CompilerServices.RuntimeHelpers.PrepareMethod(method.MethodHandle);
-            //    }
-            //}
-
-            GetAllAssembly().ForEach(x => Assembly.LoadFrom(x));
-        }
+        
 
         public T GetInstance<T>(params object[] args) where T : class
         {

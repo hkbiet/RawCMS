@@ -15,6 +15,7 @@
     <Folder Include="conf\" />
     <Folder Include="Controllers\" />
     <Folder Include="Middlewares\" />
+    <Folder Include="Plugins\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
 
@@ -50,12 +51,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Plugins\RawCMS.Plugin.Core\RawCMS.Plugins.Core.csproj" />
     <ProjectReference Include="..\RawCMS.Library\RawCMS.Library.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <None Update="C:\Users\Daniele\.nuget\packages\nlog.config\4.5.4\contentFiles\any\any\NLog.config" Link="conf\NLog.config" />
   </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JSONSchema="" /></VisualStudio></ProjectExtensions>
  
 </Project>

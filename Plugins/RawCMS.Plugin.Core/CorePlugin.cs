@@ -29,10 +29,10 @@ namespace RawCMS.Plugins.Core
 
             services.Configure<MongoSettings>(x =>
             {
-                x = mongoSettings;
+                x = appSettings.DatabaseConnection;
             });
 
-            IOptions<MongoSettings> settingsOptions = Options.Create<MongoSettings>(mongoSettings);
+            IOptions<MongoSettings> settingsOptions = Options.Create<MongoSettings>(appSettings.DatabaseConnection);
             MongoService mongoService = new MongoService(settingsOptions);
             CRUDService crudService = new CRUDService(mongoService, settingsOptions);
 
@@ -93,11 +93,11 @@ namespace RawCMS.Plugins.Core
             base.Configure(app, appEngine);
         }
 
-        private readonly MongoSettings mongoSettings = new MongoSettings();
+        private readonly AppSettings appSettings = new AppSettings();
 
         public override void Setup(IConfigurationRoot configuration)
         {
-            configuration.GetSection("MongoSettings").Bind(mongoSettings);
+            configuration.GetSection("RawCms").Bind(appSettings);
         }
     }
 }
