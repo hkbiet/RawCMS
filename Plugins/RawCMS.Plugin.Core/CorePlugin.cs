@@ -14,6 +14,11 @@ namespace RawCMS.Plugins.Core
 {
     public class CorePlugin : RawCMS.Library.Core.Extension.Plugin
     {
+        public CorePlugin()
+        {
+           
+        }
+
         public override string Name => "Core";
 
         public override string Description => "Add core CMS capabilities";
@@ -25,6 +30,8 @@ namespace RawCMS.Plugins.Core
 
         public override void ConfigureServices(IServiceCollection services)
         {
+            Logger.LogInformation("Core plugin ConfigureServices");
+
             base.ConfigureServices(services);
 
             services.Configure<MongoSettings>(x =>
@@ -51,8 +58,12 @@ namespace RawCMS.Plugins.Core
             
         }
 
+
+
         private void SetConfiguration(Plugin plugin, CRUDService crudService)
         {
+            Logger.LogInformation("Core plugin SetConfiguration");
+
             Type confitf = plugin.GetType().GetInterface("IConfigurablePlugin`1");
             if (confitf != null)
             {
@@ -90,6 +101,8 @@ namespace RawCMS.Plugins.Core
 
         public override void Configure(IApplicationBuilder app, AppEngine appEngine)
         {
+            Logger.LogInformation("Core plugin Configure");
+
             base.Configure(app, appEngine);
         }
 
@@ -97,7 +110,14 @@ namespace RawCMS.Plugins.Core
 
         public override void Setup(IConfigurationRoot configuration)
         {
+            Logger.LogInformation("Core plugin Setup");
             configuration.GetSection("RawCms").Bind(appSettings);
+        }
+
+        public override void OnPluginLoaded()
+        {
+            base.OnPluginLoaded();
+            Logger.LogInformation("Core plugin Activated!");
         }
     }
 }

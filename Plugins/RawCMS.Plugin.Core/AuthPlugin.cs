@@ -24,16 +24,18 @@ namespace RawCMS.Plugins.Core
 
         public override void Init()
         {
-            Logger.LogInformation("Authorization plugin loaded");
+            Logger.LogInformation("AuthPlugin plugin loaded");
         }
 
         private RawUserStore userStore = new RawUserStore();
 
         public override void ConfigureServices(IServiceCollection services)
         {
+            Logger.LogInformation("AuthPlugin plugin ConfigureServices");
+
             base.ConfigureServices(services);
 
-            services.Configure<ConfigurationOptions>(configuration);
+            
 
             services.AddSingleton<IUserStore<IdentityUser>>(x => { return userStore; });
             services.AddSingleton<IUserPasswordStore<IdentityUser>>(x => { return userStore; });
@@ -115,6 +117,8 @@ namespace RawCMS.Plugins.Core
 
         public override void Setup(IConfigurationRoot configuration)
         {
+            Logger.LogInformation("AuthPlugin plugin Setup");
+
             base.Setup(configuration);
             this.configuration = configuration;
         }
@@ -123,6 +127,8 @@ namespace RawCMS.Plugins.Core
 
         public override void Configure(IApplicationBuilder app, AppEngine appEngine)
         {
+            Logger.LogInformation("AuthPlugin plugin Configure");
+
             this.appEngine = appEngine;
 
             userStore.SetCRUDService(this.appEngine.Service);
@@ -156,6 +162,13 @@ namespace RawCMS.Plugins.Core
         public void SetActualConfig(AuthConfig config)
         {
             this.config = config;
+        }
+
+
+        public override void OnPluginLoaded()
+        {
+            base.OnPluginLoaded();
+            Logger.LogInformation("Auth plugin Activated!");
         }
     }
 }

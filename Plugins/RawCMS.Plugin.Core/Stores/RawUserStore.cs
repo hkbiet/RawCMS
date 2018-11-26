@@ -99,7 +99,7 @@ namespace RawCMS.Plugins.Core.Stores
             this.service = service;
         }
 
-        public void SetLogger(ILogger logger)
+        public  void SetLogger(ILogger logger)
         {
             this.logger = logger;
         }

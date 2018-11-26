@@ -7,7 +7,7 @@ using RawCMS.Library.Core.Interfaces;
 namespace RawCMS.Library.Core.Extension
 {
     /// <summary>
-    /// RawCMS plugin definitio
+    /// RawCMS plugin definition
     /// </summary>
     public abstract class Plugin : IRequireApp, IInitable
     {
@@ -26,6 +26,11 @@ namespace RawCMS.Library.Core.Extension
             Logger = Engine.GetLogger(this);
         }
 
+        public virtual void OnPluginLoaded()
+        {
+            Logger.LogInformation($"Plugin {Name} is loaded!");
+
+        }
         /// <summary>
         /// startup application event
         /// </summary>
@@ -42,7 +47,7 @@ namespace RawCMS.Library.Core.Extension
         /// <param name="services"></param>
         public virtual void ConfigureServices(IServiceCollection services)
         {
-            //DO NOTHING
+            Logger.LogInformation(this.GetType().FullName + " hit ConfigureServices");
         }
 
         /// <summary>
@@ -53,6 +58,7 @@ namespace RawCMS.Library.Core.Extension
         public virtual void Configure(IApplicationBuilder app, AppEngine appEngine)
         {
             //DO NOTHING
+            Logger.LogInformation(this.GetType().FullName + " hit Configure");
         }
 
         /// <summary>
@@ -62,6 +68,7 @@ namespace RawCMS.Library.Core.Extension
         public virtual void Setup(IConfigurationRoot configuration)
         {
             //DO NOTHING
+            Logger.LogInformation(this.GetType().FullName + " hit Setup");
         }
     }
 }

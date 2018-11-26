@@ -22,6 +22,7 @@ namespace RawCMS.Library.Core
         private static ILogger _logger;
         private IConfigurationRoot config;
         private AppSettings appSettings=new AppSettings();
+        private List<Assembly> assemblies = new List<Assembly>();
        
 
         private ILoggerFactory loggerFactory;
@@ -138,9 +139,9 @@ namespace RawCMS.Library.Core
             List<string> dlls = new List<string>();
             dlls.AddRange(Directory.GetFiles(searchFolder, "*.dll", SearchOption.AllDirectories));
             //Naming convention: Can be improved
-              dlls = dlls.Where(x => x.Contains("RawCMS.Plugins")).ToList();
+              dlls = dlls.Where(x => x.Contains("RawCMS.Plugins") || x.Contains("RawCMS.Library")).ToList();
 
-            dlls.RemoveAll(x => x.Contains("RawCMS.Library"));
+           // dlls.RemoveAll(x => x.Contains("RawCMS.Library"));
 
             for (int i = 0; i < dlls.Count; i++)
             {
@@ -155,19 +156,34 @@ namespace RawCMS.Library.Core
                 });
             }
 
-           
-                dlls.ForEach(x => {
+            var libraryTypes=new List<Type>();
+            libraryTypes.AddRange(this.GetType().Assembly.GetTypes());
+            foreach (var satellite in this.GetType().Assembly.GetReferencedAssemblies())
+            {
+                libraryTypes.AddRange(AssemblyLoadContext.Default.LoadFromAssemblyName(satellite).GetTypes());
+            }
+            //libraryTypes.Add(typeof(JObject));
+            //libraryTypes.Add(typeof(JArray));
+            //libraryTypes.Add(typeof(ILogger));
+            //libraryTypes.Add(typeof(IRequireLog));
+            //libraryTypes.Add(typeof(RestLambda));
+            //libraryTypes.Add(typeof(HttpLambda));
+
+
+
+            dlls.ForEach(x => {
                     
                         _logger.LogInformation("Loading plugin from: {0}", x);
                     //try
                     //{
                         if (File.Exists(x))
                         {
-                            var loader = PluginLoader.CreateFromAssemblyFile(
-                                x,
-                                sharedTypes: new Type[] { typeof(Plugin) , typeof(ILogger),typeof(JObject)});
-                               loader.LoadDefaultAssembly();
-                        }
+                    var loader = PluginLoader.CreateFromAssemblyFile(
+                        x,
+                        sharedTypes: libraryTypes.ToArray());
+                    var a = loader.LoadDefaultAssembly();
+                    this.assemblies.Add(a);
+                }
                     //}
                     //catch (Exception err)
                     //{
@@ -253,21 +269,34 @@ namespace RawCMS.Library.Core
 
             foreach (Assembly assembly in bundledAssemblies)
             {
-                _logger.LogDebug("loading from" + assembly.FullName);
-                Type[] types = assembly.GetTypes();
-
-                foreach (Type type in types)
+                try
                 {
-                    try
+                    
+                    _logger.LogDebug("loading from" + assembly.FullName);
+                    List<Type> types = new List<Type>(assembly.GetTypes());
+                    _logger.LogDebug("found" + types.Count);
+
+                    foreach (Type type in types)
                     {
-                        if (t.IsAssignableFrom(type) && !type.IsAbstract && !type.IsInterface)
+                        try
                         {
-                            result.Add(type);
+                            if (t.IsAssignableFrom(type) && !type.IsAbstract && !type.IsInterface)
+                            {
+                                result.Add(type);
+                            }
+                        }
+                        catch (Exception err)
+                        {
+                            _logger.LogError(err, "- (unable to create an instance for EXCEPTION skipped) - " + type.Name + " | " + type.GetType().FullName);
                         }
                     }
-                    catch (Exception err)
+                }
+                catch (ReflectionTypeLoadException err)
+                {
+                    _logger.LogCritical(err,$"unable to load assembly {assembly.FullName}");
+                    foreach (var le in err.LoaderExceptions)
                     {
-                        _logger.LogError(err, "- (unable to create an instance for EXCEPTION skipped) - " + type.Name + " | " + type.GetType().FullName);
+                        _logger.LogError(le, "inner error");
                     }
                 }
             }
@@ -282,9 +311,13 @@ namespace RawCMS.Library.Core
         public List<Assembly> GetAssemblyInScope()
         {
             List<Assembly> plugins = new List<Assembly>();
-            plugins.AddRange(GetAssemblyWithInstance<Plugin>());
+           // plugins.AddRange(GetAssemblyWithInstance<Plugin>());
             plugins.Add(Assembly.GetExecutingAssembly());
             plugins.Add(Assembly.GetEntryAssembly());
+            foreach (var a in assemblies)
+            {
+                plugins.Add(a);
+            }
             return plugins;
         }
 
