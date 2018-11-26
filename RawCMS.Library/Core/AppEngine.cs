@@ -139,7 +139,7 @@ namespace RawCMS.Library.Core
             List<string> dlls = new List<string>();
             dlls.AddRange(Directory.GetFiles(searchFolder, "*.dll", SearchOption.AllDirectories));
             //Naming convention: Can be improved
-              dlls = dlls.Where(x => x.Contains("RawCMS.Plugins") || x.Contains("RawCMS.Library")).ToList();
+              dlls = dlls.Where(x => x.Contains("RawCMS.Plugins") ).ToList();
 
            // dlls.RemoveAll(x => x.Contains("RawCMS.Library"));
 

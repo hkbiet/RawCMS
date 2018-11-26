@@ -107,10 +107,10 @@ namespace RawCMS.Plugins.Core
                  });
             }
 
-            services.AddMvc(options =>
-            {
-                options.Filters.Add(new RawAuthorizationAttribute(config.ApiKey, config.AdminApiKey));
-            });
+            //services.AddMvc(options =>
+            //{
+            //    options.Filters.Add(new RawAuthorizationAttribute(config.ApiKey, config.AdminApiKey));
+            //});
         }
 
         private IConfigurationRoot configuration;
