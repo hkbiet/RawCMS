@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using GraphiQl;
+using GraphQL;
+using GraphQL.Http;
+using GraphQL.Types;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,6 +12,9 @@ using NLog.Extensions.Logging;
 using NLog.Web;
 using RawCMS.Library.Core;
 using RawCMS.Library.DataModel;
+using RawCMS.Library.GraphQL.Classes;
+using RawCMS.Library.Service;
+using RawCMS.Library.Service.Contracts;
 using RawCMS.Plugins.Core;
 using Swashbuckle.AspNetCore.Swagger;
 using System.Linq;
@@ -57,10 +64,21 @@ namespace RawCMS
                 app.UseBrowserLink();
             }
 
+            app.UseMiddleware<GraphQLMiddleware>(new GraphQLSettings
+            {
+                BuildUserContext = ctx => new GraphQLUserContext
+                {
+                    User = ctx.User
+                },
+                EnableMetrics = Configuration.GetValue<bool>("EnableMetrics")
+            });
+
             appEngine.Plugins.OrderBy(x => x.Priority).ToList().ForEach(x =>
             {
                 x.Configure(app, appEngine);
             });
+
+            app.UseGraphiQl("/graphql", "/api/graphql");
 
             app.UseMvc();
 
@@ -91,6 +109,12 @@ namespace RawCMS
             {
                 x.Setup(Configuration);
             });
+
+            services.AddSingleton<IDependencyResolver>(s => new FuncDependencyResolver(s.GetRequiredService));
+            services.AddSingleton<IDocumentExecuter, DocumentExecuter>();
+            services.AddSingleton<IDocumentWriter, DocumentWriter>();
+            services.AddScoped<ICollectionMetadata, CollectionMetadataService>();
+            services.AddScoped<ISchema, GraphQLSchema>();
 
             services.AddMvc();
 

@@ -1,8 +1,20 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 
 namespace RawCMS.Library.Schema
 {
+    public enum FieldBaseType
+    {
+        Int,
+        Float,
+        String,
+        Boolean,
+        ID,
+        Date
+    }
+
     public class Field
     {
         public string Name { get; set; }
@@ -10,6 +22,9 @@ namespace RawCMS.Library.Schema
         public bool Required { get; set; }
 
         public string Type { get; set; }
+
+        [JsonConverter(typeof(StringEnumConverter))]
+        public FieldBaseType BaseType { get; set; }
 
         public JObject Options { get; set; }
     }
