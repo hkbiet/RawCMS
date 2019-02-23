@@ -7,21 +7,22 @@ using Newtonsoft.Json.Serialization;
 using RawCMS.Library.Core;
 using RawCMS.Library.DataModel;
 using RawCMS.Library.Service;
+using RawCMS.Plugins.GraphQL.Classes;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 
-namespace RawCMS.Library.GraphQL.Types
+namespace RawCMS.Plugins.GraphQL.Types
 {
     public class JObjectFieldResolver : IFieldResolver
     {
 
-        private readonly CRUDService service;
+        private readonly GraphQLService _graphQLService;
 
-        public JObjectFieldResolver(AppEngine manager)
+        public JObjectFieldResolver(GraphQLService graphQLService)
         {
-            service = manager.Service;
+            _graphQLService = graphQLService;
         }
 
         public object Resolve(ResolveFieldContext context)
@@ -47,7 +48,7 @@ namespace RawCMS.Library.GraphQL.Types
                     context.Arguments.Remove("pageSize");
                 }
 
-                result = service.Query(context.FieldName.ToPascalCase(), new DataQuery()
+                result = _graphQLService.service.Query(context.FieldName.ToPascalCase(), new DataQuery()
                 {
                     PageNumber = pageNumber,
                     PageSize = pageSize,
@@ -57,7 +58,7 @@ namespace RawCMS.Library.GraphQL.Types
             }
             else
             {
-                result = service.Query(context.FieldName.ToPascalCase(), new DataQuery()
+                result = _graphQLService.service.Query(context.FieldName.ToPascalCase(), new DataQuery()
                 {
                     PageNumber = 1,
                     PageSize = 1000,
@@ -66,36 +67,6 @@ namespace RawCMS.Library.GraphQL.Types
             }
 
             return result.Items.ToObject<List<JObject>>();
-            ////return new RestMessage<ItemList>(result);
-            //HttpClient client = new HttpClient();
-            //var response = client.GetAsync($"http://localhost:57564/api/CRUD/{context.FieldName.ToPascalCase()}/5c208311be03fb245cd6fde5", HttpCompletionOption.ResponseContentRead).Result;
-            ////var response = client.GetAsync($"http://localhost:57564/api/CRUD/{context.FieldName.ToPascalCase()}", HttpCompletionOption.ResponseContentRead).Result;
-            //var result = response.Content.ReadAsStringAsync().Result;
-            //var tt = JObject.Parse(result)["data"]["items"];
-            //if(tt == null)
-            //{
-            //    tt = JObject.Parse(result)["data"];
-            //    var res = new List<JObject>();
-            //    res.Add(tt.ToObject<JObject>());
-            //    return res;
-            //}
-            ////var result2 = new List<JObject>();
-            ////result2.Add(JObject.Parse(tt.ToString()));
-            //return tt.ToObject<List<JObject>>();//JObject.Parse(result)["data"];
-            //var result = new List<JObject>();
-            //if (context.FieldName.Equals("testcollection", StringComparison.InvariantCultureIgnoreCase))
-            //{
-            //    result.Add(JObject.Parse(@"{ 'Key': 1, 'Description' : 'test1'}"));
-            //    result.Add(JObject.Parse(@"{ 'Key': 2, 'Description' : 'test 123'}"));
-            //}
-            //else if (context.FieldName.Equals("user", StringComparison.InvariantCultureIgnoreCase))
-            //{
-            //    result.Add(JObject.Parse(@"{'Key' : 1, 'DisplayName' : 'pippo', 'Email': 'pippo@pippo.com'}"));
-            //    result.Add(JObject.Parse(@"{'Key' : 2, 'DisplayName' : 'pippo 2', 'Email': 'pippo2@pippo.com'}"));
-            //    result.Add(JObject.Parse(@"{'Key' : 3, 'DisplayName' : 'pippo 3', 'Email': 'pippo3@pippo.com'}"));
-            //    result.Add(JObject.Parse(@"{'Key' : 4, 'DisplayName' : 'pippo 4', 'Email': 'pippo4@pippo.com'}"));
-            //}
-            //return result;
         }
 
         private string BuildMongoQuery(Dictionary<string,object> arguments)

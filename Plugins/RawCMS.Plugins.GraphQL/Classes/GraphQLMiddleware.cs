@@ -12,25 +12,26 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RawCMS.Library.GraphQL.Classes
+namespace RawCMS.Plugins.GraphQL.Classes
 {
     public class GraphQLMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly GraphQLSettings _settings;
         private readonly IDocumentExecuter _executer;
         private readonly IDocumentWriter _writer;
+        private readonly GraphQLService _service;
 
         public GraphQLMiddleware(
             RequestDelegate next,
-            GraphQLSettings settings,
             IDocumentExecuter executer,
-            IDocumentWriter writer)
+            IDocumentWriter writer,
+            GraphQLService graphQLService
+            )
         {
             _next = next;
-            _settings = settings;
             _executer = executer;
             _writer = writer;
+            _service = graphQLService;
         }
 
         public async Task Invoke(HttpContext context, ISchema schema)
@@ -46,7 +47,7 @@ namespace RawCMS.Library.GraphQL.Classes
 
         private bool IsGraphQLRequest(HttpContext context)
         {
-            return context.Request.Path.StartsWithSegments(_settings.Path)
+            return context.Request.Path.StartsWithSegments(_service.Settings.Path)
                 && string.Equals(context.Request.Method, "POST", StringComparison.OrdinalIgnoreCase);
         }
 
@@ -62,15 +63,15 @@ namespace RawCMS.Library.GraphQL.Classes
                 _.Query = request.Query;
                 _.OperationName = request.OperationName;
                 _.Inputs = request.Variables.ToInputs();
-                _.UserContext = _settings.BuildUserContext?.Invoke(context);
-                _.EnableMetrics = _settings.EnableMetrics;
-                if (_settings.EnableMetrics)
+                _.UserContext = _service.Settings.BuildUserContext?.Invoke(context);
+                _.EnableMetrics = _service.Settings.EnableMetrics;
+                if (_service.Settings.EnableMetrics)
                 {
                     _.FieldMiddleware.Use<InstrumentFieldsMiddleware>();
                 }
             });
 
-            if (_settings.EnableMetrics)
+            if (_service.Settings.EnableMetrics)
             {
                 result.EnrichWithApolloTracing(start);
             }

@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace RawCMS.Library.GraphQL.Types
+namespace RawCMS.Plugins.GraphQL.Types
 {
     public class NameFieldResolver : IFieldResolver
     {

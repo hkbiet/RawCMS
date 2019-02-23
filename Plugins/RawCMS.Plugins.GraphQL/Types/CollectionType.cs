@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace RawCMS.Library.GraphQL.Types
+namespace RawCMS.Plugins.GraphQL.Types
 {
     public class CollectionType : ObjectGraphType<object>
     {
@@ -49,7 +49,7 @@ namespace RawCMS.Library.GraphQL.Types
                 InitGraphField(field);
             }
         }
-        private void InitGraphField(Schema.Field field)
+        private void InitGraphField(Field field)
         {
             var graphQLType = (ResolveFieldMetaType(field.BaseType)).GetGraphTypeFromType(!field.Required);
             var columnField = Field(

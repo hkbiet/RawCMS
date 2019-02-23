@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace RawCMS.Library.GraphQL.Classes
+namespace RawCMS.Plugins.GraphQL.Classes
 {
     public class GraphQLRequest
     {

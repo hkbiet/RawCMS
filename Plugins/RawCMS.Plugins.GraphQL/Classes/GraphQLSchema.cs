@@ -7,11 +7,11 @@ using System.Collections.Generic;
 using System.Text;
 using SchemaQL = GraphQL.Types.Schema;
 
-namespace RawCMS.Library.GraphQL.Classes
+namespace RawCMS.Plugins.GraphQL.Classes
 {
     public class GraphQLSchema : SchemaQL
     {
-        public GraphQLSchema(IDependencyResolver dependencyResolver, ICollectionMetadata collectionMetadata, AppEngine manager) : base(dependencyResolver)
+        public GraphQLSchema(IDependencyResolver dependencyResolver, ICollectionMetadata collectionMetadata, GraphQLService manager) : base(dependencyResolver)
         {
             Query = new GraphQLQuery(collectionMetadata, manager);
         }
