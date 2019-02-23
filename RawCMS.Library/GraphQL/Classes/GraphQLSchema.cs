@@ -1,5 +1,6 @@
 ﻿using GraphQL;
 using GraphQL.Types;
+using RawCMS.Library.Core;
 using RawCMS.Library.Service.Contracts;
 using System;
 using System.Collections.Generic;
@@ -10,9 +11,9 @@ namespace RawCMS.Library.GraphQL.Classes
 {
     public class GraphQLSchema : SchemaQL
     {
-        public GraphQLSchema(IDependencyResolver dependencyResolver, ICollectionMetadata collectionMetadata) : base(dependencyResolver)
+        public GraphQLSchema(IDependencyResolver dependencyResolver, ICollectionMetadata collectionMetadata, AppEngine manager) : base(dependencyResolver)
         {
-            Query = new GraphQLQuery(collectionMetadata);
+            Query = new GraphQLQuery(collectionMetadata, manager);
         }
     }
 }

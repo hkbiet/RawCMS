@@ -1,5 +1,6 @@
 ﻿using GraphQL.Types;
 using Newtonsoft.Json.Linq;
+using RawCMS.Library.Core;
 using RawCMS.Library.GraphQL.Types;
 using RawCMS.Library.Service.Contracts;
 using System;
@@ -10,7 +11,7 @@ namespace RawCMS.Library.GraphQL.Classes
 {
     public class GraphQLQuery : ObjectGraphType<JObject>
     {
-        public GraphQLQuery(ICollectionMetadata collectionMetadata)
+        public GraphQLQuery(ICollectionMetadata collectionMetadata, AppEngine manager)
         {
             Name = "Query";
             foreach (var metaColl in collectionMetadata.GetCollectionSchemas())
@@ -22,11 +23,13 @@ namespace RawCMS.Library.GraphQL.Classes
                     Name = metaColl.CollectionName,
                     Type = listType.GetType(),
                     ResolvedType = listType,
-                    Resolver = new JObjectFieldResolver(),
+                    Resolver = new JObjectFieldResolver(manager),
                     Arguments = new QueryArguments(
                         type.TableArgs
                     )
                 });
+
+
             }
         }
     }

@@ -13,7 +13,7 @@ namespace RawCMS.Library.Service
 
         private ICollection<CollectionSchema> collectionSchemas { get; set; }
 
-        public CollectionMetadataService(CRUDService Service)
+       public CollectionMetadataService(CRUDService Service)
         {
             this._service = Service;
             LoadCollections();
