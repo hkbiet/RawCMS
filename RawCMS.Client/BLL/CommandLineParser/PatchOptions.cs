@@ -16,6 +16,15 @@ namespace RawCMS.Client.BLL.CommandLineParser
         [Option('v', "verbose", Default = false, HelpText = "Prints all messages to standard output.")]
         public bool Verbose { get; set; }
 
+        [Option('p', "pretty", Default = false, HelpText = "Format JSON output.")]
+        public bool Pretty { get; set; }
+
+        [Option('u', "unsafe", Default = false, HelpText = "Do not use token authentication")]
+        public bool Unsafe { get; set; }
+
+        [Option('s', "server-url", Required = false, HelpText = "Server URL, only if unsafe mode is enabled.")]
+        public string ServerUrl { get; set; }
+
         [Option('c', "collection", Required = true, HelpText = "Collection where to do the operation.")]
         public string Collection { get; set; }
 

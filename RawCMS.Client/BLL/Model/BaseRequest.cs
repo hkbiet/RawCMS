@@ -14,5 +14,6 @@ namespace RawCMS.Client.BLL.Model
         public string Collection { get; set; }
         public string RawQuery { get; set; }
         public string Url { get; set; }
+        public bool Unsafe { get; set; }
     }
 }

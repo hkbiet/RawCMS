@@ -13,12 +13,7 @@ namespace RawCMS.Client.BLL.CommandLineParser
     [Verb("list", HelpText = "List data from collection. Type list for more help.")]
     public class ListOptions
     {
-        [Verb("users", HelpText = "users collections")]
-        public class UsersOptions
-        {
-            [Option("id", Required = false, HelpText = "get user by id")]
-            public string Id { get; set; }
-        }
+       
 
         [Option('v', "verbose", Default = false, HelpText = "Prints all messages to standard output.")]
         public bool Verbose { get; set; }
@@ -26,13 +21,19 @@ namespace RawCMS.Client.BLL.CommandLineParser
         [Option('p', "pretty", Default = false, HelpText = "Format JSON output.")]
         public bool Pretty { get; set; }
 
+        [Option('u', "unsafe", Default = false, HelpText = "Do not use token authentication")]
+        public bool Unsafe { get; set; }
+
+        [Option('s', "server-url", Required = false, HelpText = "Server URL, only if unsafe mode is enabled.")]
+        public string ServerUrl { get; set; }
+
         [Option('c', "collection", Required = true, HelpText = "Collection where to do the operation.")]
         public string Collection { get; set; }
 
         [Option('i', "id", Required = false, HelpText = "Element id to get.")]
         public string Id { get; set; }
 
-        [Option('s', "page-size", Required = false, HelpText = "Page Size, default 10")]
+        [Option('d', "page-size", Required = false, HelpText = "Page Size, default 10")]
         public int PageSize { get; set; }
 
         [Option('n', "page-number", Required = false, HelpText = "Page Number, default 1")]
@@ -40,5 +41,7 @@ namespace RawCMS.Client.BLL.CommandLineParser
 
         [Option('r', "raw-query", Required = false, HelpText = "Raw query.")]
         public string RawQuery { get; set; }
+
+
     }
 }

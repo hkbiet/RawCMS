@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using RawCMS.Client.BLL.CommandLineParser;
 using RawCMS.Client.BLL.Core;
 using RawCMS.Client.BLL.Interfaces;
 using RawCMS.Client.BLL.Model;
@@ -51,7 +52,10 @@ namespace RawCMS.Client.BLL.Services
             request.AddParameter("pageNumber", req.PageNumber);
             request.AddParameter("pageSize", req.PageSize);
 
-            //request.AddParameter("Authorization", "Bearer " + req.Token, ParameterType.HttpHeader);
+            if (!req.Unsafe)
+            {
+                request.AddParameter("Authorization", "Bearer " + req.Token, ParameterType.HttpHeader);
+            }
 
             // log request
             var fullUrl = client.BuildUri(request);
@@ -141,7 +145,10 @@ namespace RawCMS.Client.BLL.Services
             //add parameters and token to request
             request.Parameters.Clear();
             request.AddParameter("application/json", req.Data, ParameterType.RequestBody);
-            request.AddParameter("Authorization", "Bearer " + req.Token, ParameterType.HttpHeader);
+            if (!req.Unsafe)
+            {
+                request.AddParameter("Authorization", "Bearer " + req.Token, ParameterType.HttpHeader);
+            }
 
             //make the API request and get a response
             IRestResponse response = client.Execute(request);
@@ -262,6 +269,47 @@ namespace RawCMS.Client.BLL.Services
 
             //return true;
 
+        }
+
+        private bool ValidInsertOptions(ConfigFile config, InsertOptions opts)
+        {
+            if (!opts.Unsafe)
+            {
+                // load configuration..
+
+                config = _configService.Load();
+
+                if (config == null)
+                {
+                    _loggerService.Warn("No configuratin file found. Please login before continue.");
+                    _loggerService.Warn("Program aborted.");
+                    return 0;
+                }
+
+                string token = config.Token;
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    _loggerService.Warn("No token found. Please login before continue.");
+                    _loggerService.Warn("Program aborted.");
+                    return 0;
+                };
+            }
+            else
+            {
+                _loggerService.Warn("Run unsafe mode. No authentication will be used.");
+                if (string.IsNullOrEmpty(opts.ServerUrl))
+                {
+                    _loggerService.Warn("No server url found. Please use -s (--server-url) to specify server URL.");
+                    _loggerService.Warn("Program aborted.");
+                    return 0;
+                }
+                config = new ConfigFile()
+                {
+                    ServerUrl = opts.ServerUrl,
+                };
+
+            }
         }
 
     }

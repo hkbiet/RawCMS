@@ -116,51 +116,46 @@ MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
             bool Recursive = opts.Recursive;
             bool DryRun = opts.DryRun;
             bool Pretty = opts.Pretty;
-            string collection = opts.Collection;
-            string filePath = opts.FilePath;
-            string folderPath = opts.FolderPath;
+            bool Unsafe = opts.Unsafe;
+            string Server = opts.ServerUrl;
+            string Collection = opts.Collection;
+            string FilePath = opts.FilePath;
+            string FolderPath = opts.FolderPath;
 
+            
             // setting log/console Output
             _loggerService.SetVerbose(Verbose);
             _loggerService.SetPretty(Pretty);
 
-            // check token befare action..
-            ConfigFile config = _configService.Load();
+            ConfigFile config = null;
 
-            if (config == null)
+            if (_rawCmsService.ValidInsertOptions(config, opts))
             {
-                _loggerService.Warn("No configuratin file found. Please login before continue.");
-                _loggerService.Warn("Program aborted.");
                 return 0;
             }
 
-            string token = config.Token;
+            
 
-            if (string.IsNullOrEmpty(token))
-            {
-                _loggerService.Warn("No token found. Please login before continue.");
-                _loggerService.Warn("Program aborted.");
-                return 0;
-            };
 
-            _loggerService.Debug($"Working into collection: {collection}");
+            _loggerService.Debug($"Working on server URL: {Server}");
+            _loggerService.Debug($"Working into collection: {Collection}");
 
             Dictionary<string, List<string>> listFile = new Dictionary<string, List<string>>();
 
             // pass a file to options
-            if (!string.IsNullOrEmpty(filePath))
+            if (!string.IsNullOrEmpty(FilePath))
             {
                 // check if file exists
-                if (!File.Exists(filePath))
+                if (!File.Exists(FilePath))
                 {
-                    _loggerService.Warn($"File not found: {filePath}");
+                    _loggerService.Warn($"File not found: {FilePath}");
                     return 0;
                 }
 
                 // check if file is valid json
 
 
-                int check = _rawCmsService.CheckJSON(filePath);
+                int check = _rawCmsService.CheckJSON(FilePath);
 
                 if (check != 0)
                 {
@@ -169,26 +164,26 @@ MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
                 }
                 List<string> filelist = new List<string>
                 {
-                    filePath
+                    FilePath
                 };
-                listFile.Add(collection, filelist);
+                listFile.Add(Collection, filelist);
             }
-            else if (!string.IsNullOrEmpty(folderPath))
+            else if (!string.IsNullOrEmpty(FolderPath))
             {
                 string cwd = Directory.GetCurrentDirectory();
                 _loggerService.Info($"Current working directory: {cwd}");
 
                 // get all file from folder
-                if (!Directory.Exists(folderPath))
+                if (!Directory.Exists(FolderPath))
                 {
-                    _loggerService.Warn($"File not found: {filePath}");
+                    _loggerService.Warn($"File not found: {FilePath}");
                     return 0;
                 }
 
                 // This path is a directory
                 // get first level path,
                 // folder => collection
-                DirectoryInfo dInfo = new DirectoryInfo(folderPath);
+                DirectoryInfo dInfo = new DirectoryInfo(FolderPath);
                 DirectoryInfo[] subdirs = dInfo.GetDirectories();
 
                 foreach (DirectoryInfo subDir in subdirs)
@@ -344,11 +339,8 @@ MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
             var lin = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
             var osx = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
 
-            string SetEnv = "SET";
-            if (lin || osx)
-            {
-                SetEnv = "export";
-            }
+            string SetEnv = (lin || osx) ? "export" : "SET";
+           
 
             var os = System.Environment.OSVersion.Platform;
             _loggerService.Info($"os: {os.ToString()}");
@@ -362,5 +354,7 @@ MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
         {
             throw new NotImplementedException();
         }
+
+       
     }
 }
