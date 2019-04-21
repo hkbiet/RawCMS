@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using CommandLine;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RawCMS.Client.BLL.CommandLineParser;
@@ -23,10 +24,12 @@ namespace RawCMS.Client.BLL.Services
     public class RawCmsService:IRawCmsService
     {
         private readonly ILoggerService _loggerService;
+        private readonly IConfigService _configService;
 
-        public RawCmsService(ILoggerService loggerService)
+        public RawCmsService(ILoggerService loggerService, IConfigService configService)
         {
             _loggerService = loggerService;
+            _configService = configService;
         }
 
         public IRestResponse GetData(ListRequest req)
@@ -271,9 +274,23 @@ namespace RawCMS.Client.BLL.Services
 
         }
 
-        private bool ValidInsertOptions(ConfigFile config, InsertOptions opts)
+        public ConfigFile ValidInsertOptions( BaseAttribute options)
         {
-            if (!opts.Unsafe)
+            InsertOptions opts = (InsertOptions)options;
+            return _validateOptions(opts.Unsafe,opts.ServerUrl);         
+        }
+
+        public ConfigFile ValidListOptions(BaseAttribute options)
+        {
+            ListOptions opts = (ListOptions)options;
+            return _validateOptions(opts.Unsafe, opts.ServerUrl);
+        }
+
+        private ConfigFile _validateOptions(bool Unsafe, string ServerUrl)
+        {
+            ConfigFile config = null;
+
+            if (!Unsafe)
             {
                 // load configuration..
 
@@ -283,7 +300,7 @@ namespace RawCMS.Client.BLL.Services
                 {
                     _loggerService.Warn("No configuratin file found. Please login before continue.");
                     _loggerService.Warn("Program aborted.");
-                    return 0;
+                    return config;
                 }
 
                 string token = config.Token;
@@ -292,25 +309,28 @@ namespace RawCMS.Client.BLL.Services
                 {
                     _loggerService.Warn("No token found. Please login before continue.");
                     _loggerService.Warn("Program aborted.");
-                    return 0;
+                    return config;
                 };
             }
             else
             {
                 _loggerService.Warn("Run unsafe mode. No authentication will be used.");
-                if (string.IsNullOrEmpty(opts.ServerUrl))
+                if (string.IsNullOrEmpty(ServerUrl))
                 {
                     _loggerService.Warn("No server url found. Please use -s (--server-url) to specify server URL.");
                     _loggerService.Warn("Program aborted.");
-                    return 0;
+                    return config;
                 }
                 config = new ConfigFile()
                 {
-                    ServerUrl = opts.ServerUrl,
+                    ServerUrl = ServerUrl,
                 };
 
             }
+            return config;
         }
 
+       
+     
     }
 }

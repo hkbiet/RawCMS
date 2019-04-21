@@ -11,7 +11,7 @@ using CommandLine;
 namespace RawCMS.Client.BLL.CommandLineParser
 {
     [Verb("list", HelpText = "List data from collection. Type list for more help.")]
-    public class ListOptions
+    public class ListOptions:BaseAttribute
     {
        
 

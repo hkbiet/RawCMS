@@ -127,15 +127,12 @@ MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
             _loggerService.SetVerbose(Verbose);
             _loggerService.SetPretty(Pretty);
 
-            ConfigFile config = null;
+            ConfigFile config = _rawCmsService.ValidInsertOptions(opts);
 
-            if (_rawCmsService.ValidInsertOptions(config, opts))
+            if (config == null)
             {
                 return 0;
             }
-
-            
-
 
             _loggerService.Debug($"Working on server URL: {Server}");
             _loggerService.Debug($"Working into collection: {Collection}");
@@ -153,8 +150,6 @@ MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
                 }
 
                 // check if file is valid json
-
-
                 int check = _rawCmsService.CheckJSON(FilePath);
 
                 if (check != 0)
@@ -208,50 +203,39 @@ MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
 
 
             bool Verbose = opts.Verbose;
-            _loggerService.SetVerbose(Verbose);
-
             bool Pretty = opts.Pretty;
-            _loggerService.SetPretty(Pretty);
-
             int PageSize = opts.PageSize;
             int PageNumber = opts.PageNumber;
             string RawQuery = opts.RawQuery;
+            string Id = opts.Id;
+            string Collection = opts.Collection;
 
-            string id = opts.Id;
-            string collection = opts.Collection;
+            _loggerService.SetPretty(Pretty);
+            _loggerService.SetVerbose(Verbose);
 
-            //// check token befare action..
-            ConfigFile config = _configService.Load();
-
+            ConfigFile config = _rawCmsService.ValidListOptions(opts);
+            
             if (config == null)
             {
-                _loggerService.Warn("No configuratin file found. Please login before continue.");
-                _loggerService.Warn("Program aborted.");
                 return 0;
             }
-            string token = config.Token;
+           
 
-            if (string.IsNullOrEmpty(token))
-            {
-                _loggerService.Warn("No token found. Please login.");
-                return 0;
-            };
-
-            _loggerService.Debug($"Perform action in collection: {collection}");
+            _loggerService.Debug($"Perform action in collection: {Collection}");
 
             ListRequest req = new ListRequest
             {
-                Collection = collection,
-                Token = token,
+                Collection = Collection,
+                Token = config.Token,
                 PageNumber = PageNumber < 1 ? 1 : PageNumber,
                 PageSize = PageSize < 1 ? 10 : PageSize,
                 RawQuery = RawQuery,
                 Url = config.ServerUrl
             };
 
-            if (!string.IsNullOrEmpty(id))
+            if (!string.IsNullOrEmpty(Id))
             {
-                req.Id = id;
+                req.Id = Id;
             }
 
             RestSharp.IRestResponse responseRawCMS = _rawCmsService.GetData(req);

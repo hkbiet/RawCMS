@@ -11,7 +11,7 @@ using CommandLine;
 namespace RawCMS.Client.BLL.CommandLineParser
 {
     [Verb("insert", HelpText = "Insert data inside collection. Type insert for more help.")]
-    public class InsertOptions
+    public class InsertOptions:BaseAttribute
     {
         [Option('v', "verbose", Default = false, HelpText = "Prints all messages to standard output.")]
         public bool Verbose { get; set; }
