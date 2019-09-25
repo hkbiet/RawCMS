@@ -12,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using RawCMS.Library.Core;
+using RawCMS.Library.Core.Extension;
 using RawCMS.Library.Core.Interfaces;
 
 namespace RawCMS.Plugins.KeyStore
@@ -27,6 +28,7 @@ namespace RawCMS.Plugins.KeyStore
         public override string Description => "Add KeyStore capabilities";
 
         private readonly KeyStoreSettings config;
+        private readonly AppEngine appEngine;
 
         public KeyStorePlugin(AppEngine appEngine, KeyStoreSettings config, ILogger logger) : base(appEngine, logger)
         {
@@ -42,10 +44,10 @@ namespace RawCMS.Plugins.KeyStore
 
         public override void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<KeyStoreService, KeyStoreService>();
+            services.AddSingletonWithOverride<IKeyStoreService, KeyStoreService>(this.appEngine);
         }
 
-        private AppEngine appEngine;
+        
 
         public override void Configure(IApplicationBuilder app)
         {

@@ -36,6 +36,8 @@ namespace RawCMS.Library.Core
 
         public List<Plugin> Plugins { get; set; } = new List<Plugin>();
 
+        public ReflectionManager ReflectionManager => reflectionManager;
+
         public AppEngine(ILogger _logger, Func<string, string> pluginPathLocator, ReflectionManager reflectionManager, IConfigurationRoot configuration)
         {
             this._logger = _logger;
@@ -360,6 +362,14 @@ namespace RawCMS.Library.Core
                 _logger.LogDebug($"Lambda found {type.FullName}");
                 services.AddSingleton(type);
             }
+        }
+
+
+        public IServiceCollection AddSingletonWithOverride<TService, TImplementation>(IServiceCollection services)
+        where TService : class
+        where TImplementation : class, TService
+        {
+            return services.AddSingletonWithOverride<TService, TImplementation>(this);
         }
     }
 }

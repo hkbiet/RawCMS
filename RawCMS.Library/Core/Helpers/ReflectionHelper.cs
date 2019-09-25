@@ -42,6 +42,15 @@ namespace RawCMS.Library.Core.Helpers
             return result;
         }
 
+        public object InvokeGenericMethod(object instance,string methodName, Type[] types, object[] parameters)
+        {
+            var instanceType = instance.GetType();
+            var method =instance.GetType().GetMethod(methodName);
+            var genericMethod = method.MakeGenericMethod(types);
+
+           return  genericMethod.Invoke(instance, parameters);             
+        }
+
         public T GetInstance<T>(params object[] args) where T : class
         {
             return Activator.CreateInstance(typeof(T), args) as T;
