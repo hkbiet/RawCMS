@@ -28,7 +28,7 @@ namespace RawCMS.Plugins.KeyStore
         public override string Description => "Add KeyStore capabilities";
 
         private readonly KeyStoreSettings config;
-        private readonly AppEngine appEngine;
+        
 
         public KeyStorePlugin(AppEngine appEngine, KeyStoreSettings config, ILogger logger) : base(appEngine, logger)
         {
@@ -44,7 +44,7 @@ namespace RawCMS.Plugins.KeyStore
 
         public override void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingletonWithOverride<IKeyStoreService, KeyStoreService>(this.appEngine);
+            services.AddSingletonWithOverride<IKeyStoreService, KeyStoreService>(this.Engine);
         }
 
         

@@ -7,12 +7,12 @@ namespace RawCMS.Plugins.KeyStore
     {
         private static readonly Dictionary<string, object> db = new Dictionary<string, object>();
 
-        public object Get(string key)
+        public virtual object Get(string key)
         {
             return db[key];
         }
 
-        public void Set(KeyStoreInsertModel insert)
+        public virtual void Set(KeyStoreInsertModel insert)
         {
             db[insert.Key] = insert.Value;
         }
