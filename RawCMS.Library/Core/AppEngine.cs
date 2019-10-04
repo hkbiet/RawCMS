@@ -247,16 +247,7 @@ namespace RawCMS.Library.Core
             _logger.LogInformation($" Getting all plugin types");
             List<Type> plugins = new List<Type>();
             // Create an instance of plugin types
-            foreach (var loader in loaders)
-            {
-                foreach (var pluginType in loader
-                    .LoadDefaultAssembly()
-                    .GetTypes()
-                    .Where(t => typeof(Plugin).IsAssignableFrom(t) && !t.IsAbstract))
-                {
-                    plugins.Add(pluginType);
-                }
-            }
+            plugins.AddRange(GetPluginTypes<Plugin>());
             return plugins;
         }
 
@@ -265,6 +256,7 @@ namespace RawCMS.Library.Core
             _logger.LogDebug("Discover Lambdas in Bundle");
 
             List<Type> lambdas = this.reflectionManager.GetImplementors<Lambda>();
+            lambdas.AddRange(GetPluginTypes<Lambda>());
 
             foreach (var lambda in lambdas)
             {
@@ -293,6 +285,23 @@ namespace RawCMS.Library.Core
             {
                 DumpLambdaInfo();
             }
+        }
+
+        private List<Type> GetPluginTypes<T>()
+        {
+            var result = new List<Type>();
+            foreach (var loader in loaders)
+            {
+                foreach (var type in loader
+                    .LoadDefaultAssembly()
+                    .GetTypes()
+                    .Where(t => typeof(T).IsAssignableFrom(t) && !t.IsAbstract))
+                {
+                    result.Add(type);
+                }
+            }
+
+            return result;
         }
 
         private void DumpLambdaInfo()
@@ -356,6 +365,8 @@ namespace RawCMS.Library.Core
             _logger.LogDebug("Discover Lambdas in Bundle");
 
             List<Type> lambdas = this.reflectionManager.GetImplementors<Lambda>();
+
+            lambdas.AddRange(GetPluginTypes<Lambda>());
 
             foreach (Type type in lambdas)
             {
