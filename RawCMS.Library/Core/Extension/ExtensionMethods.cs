@@ -21,7 +21,8 @@ namespace RawCMS.Library.Core.Extension
                 replacedType = replacement.First().ReplacedWith;
             }
 
-            appEngine.ReflectionManager.InvokeGenericMethod(services,"AddSingleton", new Type[] { typeof(TService), replacedType }, new object[] { });
+            
+            appEngine.ReflectionManager.InvokeGenericMethod(null, typeof(ServiceCollectionServiceExtensions), "AddSingleton", new Type[] { typeof(TService), replacedType }, new object[] { services });
 
             return services;
         }

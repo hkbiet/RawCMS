@@ -42,10 +42,20 @@ namespace RawCMS.Library.Core.Helpers
             return result;
         }
 
-        public object InvokeGenericMethod(object instance,string methodName, Type[] types, object[] parameters)
+        public object InvokeGenericMethod(object instance,Type instanceType, string methodName, Type[] types, object[] parameters)
         {
-            var instanceType = instance.GetType();
-            var method =instance.GetType().GetMethod(methodName);
+            
+            if (instanceType == null)
+            {
+                instanceType = instance.GetType();
+            }
+            var methods = instanceType.GetMethods();
+            var method=methods
+                .Where(x => x.Name == methodName 
+                && x.GetParameters().Length == parameters.Length 
+                && x.GetGenericArguments().Length == types.Length) //TODO: check also type, not only the number of arguments
+                .FirstOrDefault();
+
             var genericMethod = method.MakeGenericMethod(types);
 
            return  genericMethod.Invoke(instance, parameters);             

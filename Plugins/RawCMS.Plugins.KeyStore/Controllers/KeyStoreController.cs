@@ -11,9 +11,9 @@ namespace RawCMS.Plugins.KeyStore.Controllers
     [Route("api/[controller]")]
     public class KeyStoreController : Controller
     {
-        private KeyStoreService service;
+        private IKeyStoreService service;
 
-        public KeyStoreController(KeyStoreService service)
+        public KeyStoreController(IKeyStoreService service)
         {
             this.service = service;
         }
