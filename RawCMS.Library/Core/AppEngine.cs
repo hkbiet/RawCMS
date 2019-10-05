@@ -64,10 +64,64 @@ namespace RawCMS.Library.Core
 
             List<Assembly> assembly = new List<Assembly>();
             assembly.Add(typeof(AppEngine).Assembly);
+
+            List<Type> typesToAdd = new List<Type>();
+
+            RecursiveGetAllTypes(ref assembly, ref typesToAdd);
+            typesToAdd = typesToAdd.Distinct().ToList();
+
+            _logger.LogInformation($"ASSEMBLY LOAD COMPLETED");
+
+            // create plugin loaders
+            var pluginsDir = pluginFolder ?? Path.Combine(AppContext.BaseDirectory, "plugins");
+
+            _logger.LogInformation($"Loading plugin using {pluginsDir}");
+
+            var pluginFiles = Directory.GetFiles(pluginsDir, "plugin.config", SearchOption.AllDirectories);
+
+            _logger.LogDebug($"Found  {string.Join(",", pluginFiles)}");
+
+
+            List<Assembly> contracts = new List<Assembly>();
+
+            foreach (var pluginInfo in pluginFiles)
+            {
+                if (pluginInfo.Contains("Contracts") || pluginInfo.Contains("Extension"))
+                {
+                    var loader = PluginLoader.CreateFromConfigFile(
+                   filePath: pluginInfo,
+                   sharedTypes: typesToAdd.ToArray());
+
+
+                    var contract = loader.LoadDefaultAssembly();
+                    contracts.Add(contract);
+                }
+            }
+            RecursiveGetAllTypes(ref contracts, ref typesToAdd);
+
+            typesToAdd = typesToAdd.Distinct().ToList();
+
+            var checkextraload=typesToAdd.Where(x => x.Assembly.FullName.Contains("Contracts")).ToList();
+            var checkextraload2 = typesToAdd.Where(x => x.Assembly.FullName.Contains("Extension")).ToList();
+
+            foreach (var pluginInfo in pluginFiles)
+            {
+                _logger.LogInformation($"Loading plugin  {pluginInfo}");
+                var loader = PluginLoader.CreateFromConfigFile(
+                filePath: pluginInfo,
+                sharedTypes: typesToAdd.ToArray());
+                loaders.Add(loader);
+            }
+
+
+        }
+
+        private List<Type> RecursiveGetAllTypes(ref List<Assembly> assembly, ref List<Type> typesToAdd)
+        {
             RecoursiveAddAssembly(typeof(AppEngine).Assembly, assembly);
             assembly = assembly.Distinct().ToList();
 
-            List<Type> typesToAdd = new List<Type>();
+            
             foreach (var ass in assembly)
             {
                 _logger.LogDebug($"scanning {ass.FullName}..");
@@ -84,27 +138,7 @@ namespace RawCMS.Library.Core
                 typesToAdd.AddRange(types);
             }
 
-            typesToAdd = typesToAdd.Distinct().ToList();
-
-            _logger.LogInformation($"ASSEMBLY LOAD COMPLETED");
-
-            // create plugin loaders
-            var pluginsDir = pluginFolder ?? Path.Combine(AppContext.BaseDirectory, "plugins");
-
-            _logger.LogInformation($"Loading plugin using {pluginsDir}");
-
-            var pluginFiles = Directory.GetFiles(pluginsDir, "plugin.config", SearchOption.AllDirectories);
-
-            _logger.LogDebug($"Found  {string.Join(",", pluginFiles)}");
-
-            foreach (var pluginInfo in pluginFiles)
-            {
-                _logger.LogInformation($"Loading plugin  {pluginInfo}");
-                var loader = PluginLoader.CreateFromConfigFile(
-                filePath: pluginInfo,
-                sharedTypes: typesToAdd.ToArray());
-                loaders.Add(loader);
-            }
+            return typesToAdd;
         }
 
         public static AppEngine Create(string pluginPath, ILogger logger, ReflectionManager reflectionManager, IServiceCollection services, IConfigurationRoot configuration)
@@ -354,11 +388,38 @@ namespace RawCMS.Library.Core
         public void InvokePostConfigureServices(IServiceCollection services)
         {
             _logger.LogDebug($"invoking InvokePostConfigureServices");
+
+            var activationMap = new Dictionary<Type, Type>();
             this.Plugins.OrderBy(x => x.Priority).ToList().ForEach(x =>
             {
                 _logger.LogDebug($" > invoking configuraton on plugin {x.Name}");
                 x.ConfigureServices(services);
+
+                var delta = x.GetActivationMap();
+                foreach (var key in delta.Keys)
+                {
+                    var replacement = activationMap.FirstOrDefault(y => y.Key.FullName == key.FullName);
+                    if (replacement.Key!=null)
+                    {
+                        activationMap[replacement.Key] = delta[key];
+                    }
+                    else
+                    {
+                        activationMap[key] = delta[key];
+                    }
+                }
             });
+
+            //foreach (var activation in activationMap)
+            //{                
+            //    this.reflectionManager.InvokeGenericMethod(null,
+            //        typeof(ServiceCollectionServiceExtensions), 
+            //        "AddSingleton", 
+            //        new Type[] { activation.Key, activation.Value }, 
+            //        new object[] { services });
+            //}
+
+            
         }
 
         /// <summary>

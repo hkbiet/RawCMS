@@ -15,6 +15,8 @@ using RawCMS.Library.Core;
 using RawCMS.Library.Core.Extension;
 using RawCMS.Library.Core.Interfaces;
 using RawCMS.Plugins.KeyStore.Contracts;
+using System;
+using System.Collections.Generic;
 
 namespace RawCMS.Plugins.KeyStore
 {
@@ -56,6 +58,14 @@ namespace RawCMS.Plugins.KeyStore
 
         public override void Setup(IConfigurationRoot configuration)
         {
+        }
+
+
+        public override Dictionary<Type, Type> GetActivationMap()
+        {
+            var dict = base.GetActivationMap();
+            dict[typeof(IKeyStoreService)] = typeof(KeyStoreService);
+            return dict;
         }
     }
 }

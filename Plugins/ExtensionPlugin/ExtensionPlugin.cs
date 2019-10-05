@@ -22,6 +22,8 @@ namespace ExtensionPlugin
 
         public override string Description => "";
 
+        public override int Priority => 10000;
+
         public override void Configure(Microsoft.AspNetCore.Builder.IApplicationBuilder app)
         {
             
@@ -34,10 +36,17 @@ namespace ExtensionPlugin
 
         public override void ConfigureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection services)
         {
-            services.AddSingleton<IKeyStoreService, MyFakeStore>();
+           
         }
 
-      
+
+        public override Dictionary<Type,Type> GetActivationMap()
+        {
+            var dict= base.GetActivationMap();
+            dict[typeof(IKeyStoreService)] = typeof(MyFakeStore);
+            return dict;
+        }
+
 
         public override void Setup(Microsoft.Extensions.Configuration.IConfigurationRoot configuration)
         {

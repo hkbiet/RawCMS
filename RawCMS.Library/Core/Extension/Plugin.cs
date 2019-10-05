@@ -11,6 +11,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using RawCMS.Library.Core.Interfaces;
+using System;
+using System.Collections.Generic;
 
 namespace RawCMS.Library.Core.Extension
 {
@@ -66,5 +68,12 @@ namespace RawCMS.Library.Core.Extension
         /// </summary>
         /// <param name="builder"></param>
         public abstract void ConfigureMvc(IMvcBuilder builder);
+
+
+
+        public virtual Dictionary<Type, Type> GetActivationMap()
+        {
+            return new Dictionary<Type, Type>();
+        }
     }
 }
