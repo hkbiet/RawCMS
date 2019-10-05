@@ -1,7 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using RawCMS.Library.Core;
 using RawCMS.Library.Core.Extension;
-using RawCMS.Plugins.Core.Configuration;
+using RawCMS.Plugins.KeyStore;
+using RawCMS.Plugins.KeyStore.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,7 +13,7 @@ namespace ExtensionPlugin
 {
     public class ExtensionPlugin : Plugin
     {
-        public ExtensionPlugin(AppEngine appEngine, AuthConfig config, ILogger logger) : base(appEngine, logger)
+        public ExtensionPlugin(AppEngine appEngine, ILogger logger) : base(appEngine, logger)
         {
 
         }
@@ -32,13 +34,10 @@ namespace ExtensionPlugin
 
         public override void ConfigureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection services)
         {
-            
+            services.AddSingleton<IKeyStoreService, MyFakeStore>();
         }
 
-        public override void Init()
-        {
-            
-        }
+      
 
         public override void Setup(Microsoft.Extensions.Configuration.IConfigurationRoot configuration)
         {

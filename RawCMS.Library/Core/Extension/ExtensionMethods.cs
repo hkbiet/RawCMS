@@ -13,16 +13,21 @@ namespace RawCMS.Library.Core.Extension
             where TImplementation:  class, TService
         {
             var replacedType = typeof(TImplementation);
+            var interfaceType = typeof(TService);
 
-            var replacement=appEngine.Lambdas.Where(x => x is FactoryLambda && replacedType == ((FactoryLambda)x).OriginalType).Cast<FactoryLambda>().ToList();
+            var replacement=appEngine.Lambdas.Where(x => x is FactoryLambda 
+            && (replacedType.FullName == ((FactoryLambda)x).OriginalType.FullName 
+             || interfaceType.FullName == ((FactoryLambda)x).OriginalType.FullName)// coming from different plugin: direct comparison cannot work
+            ).Cast<FactoryLambda>().ToList();
 
             if (replacement.Count > 0)
             {
                 replacedType = replacement.First().ReplacedWith;
             }
-
-            
-            appEngine.ReflectionManager.InvokeGenericMethod(null, typeof(ServiceCollectionServiceExtensions), "AddSingleton", new Type[] { typeof(TService), replacedType }, new object[] { services });
+            else
+            {
+                appEngine.ReflectionManager.InvokeGenericMethod(null, typeof(ServiceCollectionServiceExtensions), "AddSingleton", new Type[] { typeof(TService), replacedType }, new object[] { services });
+            }
 
             return services;
         }

@@ -99,7 +99,11 @@ namespace RawCMS
                 loggerFactory.CreateLogger<AppEngine>(),
                 rm, services, Configuration);
 
+          
+
             appEngine.InvokeConfigureServices(ass, builder, services, Configuration);
+
+            
 
             foreach (var a in ass.Distinct())
             {

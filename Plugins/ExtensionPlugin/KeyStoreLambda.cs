@@ -1,5 +1,7 @@
 ﻿using RawCMS.Library;
 using RawCMS.Plugins.KeyStore;
+using RawCMS.Plugins.KeyStore.Contracts;
+using RawCMS.Plugins.KeyStore.Contracts.Model;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -10,17 +12,22 @@ namespace ExtensionPlugin
     {
         public override string PluginName => "RawCMS.Plugins.Core";
 
-        public override Type OriginalType => typeof(KeyStoreService);
+        public override Type OriginalType => typeof(IKeyStoreService);
 
         public override Type ReplacedWith => typeof(MyFakeStore);
     }
 
 
-    public class MyFakeStore : KeyStoreService
+    public class MyFakeStore : IKeyStoreService
     {
-        public override object Get(string key)
+        public object Get(string key)
         {
-            return "this was hacked";
+            return "fake";
+        }
+
+        public void Set(KeyStoreInsertModel insert)
+        {
+           //FAKE
         }
     }
 }

@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <OutputPath>..\..\RawCMS\Plugins\RawCMS.Plugins.Core</OutputPath>
+    <OutputPath>..\..\RawCMS\Plugins\ExtensionPlugin</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -58,8 +58,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\RawCMS.Library\RawCMS.Library.csproj" />
-    <ProjectReference Include="..\RawCMS.Plugin.Core\RawCMS.Plugins.Core.csproj" />
-    <ProjectReference Include="..\RawCMS.Plugins.KeyStore\RawCMS.Plugins.KeyStore.csproj" />
+    <ProjectReference Include="..\RawCMS.Plugins.KeyStore.Contracts\RawCMS.Plugins.KeyStore.Contracts.csproj" />
   </ItemGroup>
 
 </Project>

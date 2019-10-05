@@ -1,6 +1,8 @@
-﻿using RawCMS.Plugins.KeyStore.Model;
+﻿
 
-namespace RawCMS.Plugins.KeyStore
+using RawCMS.Plugins.KeyStore.Contracts.Model;
+
+namespace RawCMS.Plugins.KeyStore.Contracts
 {
     public interface IKeyStoreService
     {

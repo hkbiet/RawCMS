@@ -47,6 +47,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RawCMS.Plugins.KeyStore", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExtensionPlugin", "Plugins\ExtensionPlugin\ExtensionPlugin.csproj", "{6147BF43-2096-4004-B700-2C4714349D0F}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RawCMS.Plugins.KeyStore.Contracts", "Plugins\RawCMS.Plugins.KeyStore.Contracts\RawCMS.Plugins.KeyStore.Contracts.csproj", "{4EE3E715-7EC4-45BA-BA4B-4B79CECAF9C4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -85,6 +87,10 @@ Global
 		{6147BF43-2096-4004-B700-2C4714349D0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6147BF43-2096-4004-B700-2C4714349D0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6147BF43-2096-4004-B700-2C4714349D0F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4EE3E715-7EC4-45BA-BA4B-4B79CECAF9C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4EE3E715-7EC4-45BA-BA4B-4B79CECAF9C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4EE3E715-7EC4-45BA-BA4B-4B79CECAF9C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4EE3E715-7EC4-45BA-BA4B-4B79CECAF9C4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -95,6 +101,7 @@ Global
 		{2C443D9E-BDDE-4147-9EE4-7E93652EE7EC} = {6DA8883F-F42E-4FDC-A93A-1D41549F6C05}
 		{CE2FFFD9-CB20-42CF-809E-2B17B4CF8AC5} = {6DA8883F-F42E-4FDC-A93A-1D41549F6C05}
 		{6147BF43-2096-4004-B700-2C4714349D0F} = {6DA8883F-F42E-4FDC-A93A-1D41549F6C05}
+		{4EE3E715-7EC4-45BA-BA4B-4B79CECAF9C4} = {6DA8883F-F42E-4FDC-A93A-1D41549F6C05}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EE0F5781-A4C7-4C01-8B4C-4AE7A10908CF}

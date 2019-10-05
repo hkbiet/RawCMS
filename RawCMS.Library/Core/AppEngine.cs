@@ -251,7 +251,7 @@ namespace RawCMS.Library.Core
             return plugins;
         }
 
-        private void LoadLambdas(IApplicationBuilder applicationBuilder)
+        private void LoadLambdas(IServiceProvider provider)
         {
             _logger.LogDebug("Discover Lambdas in Bundle");
 
@@ -263,7 +263,7 @@ namespace RawCMS.Library.Core
                 try
                 {
                     _logger.LogDebug($"loading Lambdas {lambda} ");
-                    var lambdaInstance = applicationBuilder.ApplicationServices.GetService(lambda) as Lambda;
+                    var lambdaInstance = provider.GetService(lambda) as Lambda;
                     if (lambdaInstance != null)
                     {
                         _logger.LogDebug($"loading Lambdas {lambdaInstance.Name} - {lambdaInstance.Description} - {lambdaInstance.GetType().FullName} ");
@@ -323,7 +323,7 @@ namespace RawCMS.Library.Core
         public void InvokeConfigure(IApplicationBuilder app)
         {
             _logger.LogDebug($"invoking configuraton");
-            this.LoadLambdas(app);
+            
 
             this.Plugins.OrderBy(x => x.Priority).ToList().ForEach(x =>
             {
@@ -345,6 +345,10 @@ namespace RawCMS.Library.Core
             });
 
             this.DiscoverLambdasInBundle(services);
+
+            var temp =services.BuildServiceProvider();
+            this.LoadLambdas(temp);
+
         }
 
         public void InvokePostConfigureServices(IServiceCollection services)

@@ -2,7 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using RawCMS.Library.Core.Attributes;
-using RawCMS.Plugins.KeyStore.Model;
+using RawCMS.Plugins.KeyStore.Contracts;
+using RawCMS.Plugins.KeyStore.Contracts.Model;
 
 namespace RawCMS.Plugins.KeyStore.Controllers
 {

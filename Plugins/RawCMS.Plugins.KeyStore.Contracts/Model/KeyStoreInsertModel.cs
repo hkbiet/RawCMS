@@ -1,4 +1,4 @@
-﻿namespace RawCMS.Plugins.KeyStore.Model
+﻿namespace RawCMS.Plugins.KeyStore.Contracts.Model
 {
     public class KeyStoreInsertModel
     {

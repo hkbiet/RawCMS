@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging;
 using RawCMS.Library.Core;
 using RawCMS.Library.Core.Extension;
 using RawCMS.Library.Core.Interfaces;
+using RawCMS.Plugins.KeyStore.Contracts;
 
 namespace RawCMS.Plugins.KeyStore
 {

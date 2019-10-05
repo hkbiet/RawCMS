@@ -1,4 +1,5 @@
-﻿using RawCMS.Plugins.KeyStore.Model;
+﻿using RawCMS.Plugins.KeyStore.Contracts;
+using RawCMS.Plugins.KeyStore.Contracts.Model;
 using System.Collections.Generic;
 
 namespace RawCMS.Plugins.KeyStore
