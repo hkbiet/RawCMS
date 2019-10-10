@@ -86,7 +86,7 @@ namespace RawCMS.Library.Core
 
             foreach (var pluginInfo in pluginFiles)
             {
-                if (pluginInfo.Contains("Contracts") || pluginInfo.Contains("Extension"))
+                if (pluginInfo.Contains("Contracts") )
                 {
                     var loader = PluginLoader.CreateFromConfigFile(
                    filePath: pluginInfo,
@@ -106,11 +106,14 @@ namespace RawCMS.Library.Core
 
             foreach (var pluginInfo in pluginFiles)
             {
-                _logger.LogInformation($"Loading plugin  {pluginInfo}");
-                var loader = PluginLoader.CreateFromConfigFile(
-                filePath: pluginInfo,
-                sharedTypes: typesToAdd.ToArray());
-                loaders.Add(loader);
+                if (!pluginInfo.Contains("Contracts"))
+                {
+                    _logger.LogInformation($"Loading plugin  {pluginInfo}");
+                    var loader = PluginLoader.CreateFromConfigFile(
+                    filePath: pluginInfo,
+                    sharedTypes: typesToAdd.ToArray());
+                    loaders.Add(loader);
+                }
             }
 
 
@@ -130,7 +133,10 @@ namespace RawCMS.Library.Core
                 {
                     if (type.IsPublic)
                     {
-                        _logger.LogDebug($"Added {type.FullName}..");
+                        if (_logger.IsEnabled(LogLevel.Trace))
+                        {
+                         //   _logger.LogDebug($"Added {type.FullName}..");
+                        }
                         typesToAdd.Add(type);
                     }
                 }
@@ -174,10 +180,10 @@ namespace RawCMS.Library.Core
             {
                 if (!assemblyList.Any(x => x.FullName == assName.FullName))
                 {
-                    if (_logger.IsEnabled(LogLevel.Trace))
-                    {
-                        _logger.LogTrace($"Adding {assName.FullName}");
-                    }
+                    //if (_logger.IsEnabled(LogLevel.Trace))
+                    //{
+                    //    _logger.LogTrace($"Adding {assName.FullName}");
+                    //}
 
                     Assembly.Load(assName);
                     var ass = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(x => x.GetName(false).Name == assName.Name);

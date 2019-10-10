@@ -43,7 +43,7 @@ namespace RawCMS.Plugins.KeyStore
 
         public override void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingletonWithOverride<IKeyStoreService, KeyStoreService>(this.Engine);
+           // services.AddSingleton<IKeyStoreService, KeyStoreService>();
         }
 
         

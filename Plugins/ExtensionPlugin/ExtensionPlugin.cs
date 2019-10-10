@@ -36,7 +36,7 @@ namespace ExtensionPlugin
 
         public override void ConfigureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection services)
         {
-           
+            services.AddSingleton<IKeyStoreService, MyFakeStore>((x) =>  new MyFakeStore());
         }
 
 

@@ -66,5 +66,14 @@
     <Folder Include="Lambdas\Factory\" />
   </ItemGroup>
 
- 
+
+  <Target Name="BuildPlugin" BeforeTargets="Build">
+
+    <MSBuild Projects="..\Plugins\RawCMS.Plugins.KeyStore.Contracts\RawCMS.Plugins.KeyStore.Contracts.csproj" Targets="Publish" Properties="Configuration=$(Configuration);PublishDir=$(ProjectDir)/Plugins/RawCMS.Plugins.KeyStore.Contracts/" />
+    <MSBuild Projects="..\Plugins\RawCMS.Plugins.KeyStore\RawCMS.Plugins.KeyStore.csproj" Targets="Publish" Properties="Configuration=$(Configuration);PublishDir=$(ProjectDir)/Plugins/RawCMS.Plugins.KeyStore/" />  
+    <MSBuild Projects="..\Plugins\RawCMS.Plugin.Core\RawCMS.Plugins.Core.csproj" Targets="Publish" Properties="Configuration=$(Configuration);PublishDir=$(ProjectDir)/Plugins/RawCMS.Plugins.Core/" />    
+    <MSBuild Projects="..\Plugins\RawCMS.Plugins.KeyStore\RawCMS.Plugins.KeyStore.csproj" Targets="Publish" Properties="Configuration=$(Configuration);PublishDir=$(ProjectDir)/Plugins/RawCMS.Plugins.KeyStore/" />
+    <MSBuild Projects="..\Plugins\ExtensionPlugin\ExtensionPlugin.csproj" Targets="Publish" Properties="Configuration=$(Configuration);PublishDir=$(ProjectDir)/Plugins/ExtensionPlugin/" />
+  </Target>
+
 </Project>
