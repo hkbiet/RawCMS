@@ -1,4 +1,8 @@
-﻿namespace RawCMS.Plugins.KeyStore.Model
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace RawCMS.Library.KeyStore
 {
     public class KeyStoreInsertModel
     {

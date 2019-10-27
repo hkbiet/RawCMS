@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using RawCMS.Library.Core;
 using RawCMS.Library.Core.Interfaces;
+using RawCMS.Library.KeyStore;
 
 namespace RawCMS.Plugins.KeyStore
 {
@@ -38,7 +39,7 @@ namespace RawCMS.Plugins.KeyStore
 
         public override void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<KeyStoreService, KeyStoreService>();
+            services.AddSingleton<IKeyStoreService, KeyStoreService>();
         }
 
         private AppEngine appEngine;

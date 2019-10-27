@@ -1,9 +1,9 @@
-﻿using RawCMS.Plugins.KeyStore.Model;
+﻿using RawCMS.Library.KeyStore;
 using System.Collections.Generic;
 
 namespace RawCMS.Plugins.KeyStore
 {
-    public class KeyStoreService
+    public class KeyStoreService: IKeyStoreService
     {
         private static readonly Dictionary<string, object> db = new Dictionary<string, object>();
 
@@ -12,7 +12,12 @@ namespace RawCMS.Plugins.KeyStore
             return db[key];
         }
 
-        internal void Set(KeyStoreInsertModel insert)
+        //internal void Set(KeyStoreInsertModel insert)
+        //{
+        //    db[insert.Key] = insert.Value;
+        //}
+
+        public void Set(KeyStoreInsertModel insert)
         {
             db[insert.Key] = insert.Value;
         }

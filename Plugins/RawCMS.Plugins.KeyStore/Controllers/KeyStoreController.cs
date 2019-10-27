@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using RawCMS.Library.Core.Attributes;
-using RawCMS.Plugins.KeyStore.Model;
+using RawCMS.Library.KeyStore;
 
 namespace RawCMS.Plugins.KeyStore.Controllers
 {
@@ -11,9 +11,9 @@ namespace RawCMS.Plugins.KeyStore.Controllers
     [Route("api/[controller]")]
     public class KeyStoreController : Controller
     {
-        private KeyStoreService service;
+        private IKeyStoreService service;
 
-        public KeyStoreController(KeyStoreService service)
+        public KeyStoreController(IKeyStoreService service)
         {
             this.service = service;
         }
