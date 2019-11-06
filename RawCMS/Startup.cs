@@ -41,6 +41,7 @@ namespace RawCMS
             env.ConfigureNLog(path);
 
             ApplicationLogger.SetLogFactory(loggerFactory);
+           
 
             IConfigurationBuilder builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
@@ -56,14 +57,17 @@ namespace RawCMS
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+            app.UseCors();
+
             appEngine.InvokeConfigure(app);
+            appEngine.RegisterPluginsMiddleweares(app);
 
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
                 app.UseBrowserLink();
             }
-
+            
             app.UseMvc();
 
             app.UseMvc(routes =>
@@ -79,6 +83,8 @@ namespace RawCMS
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
             });
+
+
             app.UseStaticFiles();
 
             app.UseWelcomePage();
@@ -87,6 +93,13 @@ namespace RawCMS
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(opt => opt.AddDefaultPolicy(p =>
+            {
+                p.AllowAnyHeader();
+                p.AllowAnyMethod();
+                p.AllowAnyOrigin();
+            }));
+
             var ass = new List<Assembly>();
             var builder = services.AddMvc();
             var pluginPath = Configuration.GetValue<string>("PluginPath");
@@ -94,7 +107,7 @@ namespace RawCMS
 
             ReflectionManager rm = new ReflectionManager(allAssembly);
 
-            appEngine = AppEngine.Create(
+             appEngine = AppEngine.Create(
                 pluginPath,
                 loggerFactory.CreateLogger<AppEngine>(),
                 rm, services, Configuration);
@@ -114,6 +127,8 @@ namespace RawCMS
                 c.IgnoreObsoleteActions();
                 c.DescribeAllEnumsAsStrings();
                 c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
+                c.CustomSchemaIds(t => t.FullName);
+                
             });
 
             //Invoke appEngine after service configuration
