@@ -1,3 +1,14 @@
-<p>
-  wow
-</p>
+<template>
+    <v-data-table light :headers="headers" :items="fieldSettings"
+        class="elevation-1">
+        <template v-slot:items="props">
+            <td class="text-xs-right">{{ props.item.Name }}</td>
+            <td class="text-xs-right">
+                    <v-icon>
+                        {{ props.item.Required ? "mdi-checkbox-marked" : "mdi-checkbox-blank-outline" }}
+                    </v-icon>
+            </td>
+            <td class="text-xs-right">{{ props.item.Type }}</td>
+        </template>
+    </v-data-table>
+</template>
