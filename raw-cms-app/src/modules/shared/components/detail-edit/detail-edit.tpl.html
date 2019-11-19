@@ -31,7 +31,10 @@
       <v-icon>mdi-json</v-icon>
     </v-tab>
 
+    <slot name="custom2"> </slot>
+
     <v-tabs-items v-model="activeTabId">
+      <slot name="custom3"> </slot>
       <v-tab-item value="tabCustom">
         <v-card flat tile>
           <!-- custom editor here -->
