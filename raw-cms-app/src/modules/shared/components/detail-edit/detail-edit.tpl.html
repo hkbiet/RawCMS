@@ -21,37 +21,22 @@
   >
     <v-tabs-slider></v-tabs-slider>
 
-    <v-tab href="#tabCustom">
-      {{ $t('core.common.editText') }}
-      <v-icon>mdi-pen</v-icon>
-    </v-tab>
+    <slot name="custom-tabs"></slot>
 
     <v-tab ref="tabMonacoRef" href="#tabMonaco">
       {{ $t('core.common.jsonText') }}
       <v-icon>mdi-json</v-icon>
     </v-tab>
 
-    <slot name="custom2"> </slot>
-
     <v-tabs-items v-model="activeTabId">
-      <slot name="custom3"> </slot>
-      <v-tab-item value="tabCustom">
-        <v-card flat tile>
-          <!-- custom editor here -->
-          <slot name="custom">
-            Coming soon!
-            <br />
-            Current value is:<br />
-            {{ value }}
-          </slot>
-        </v-card>
-      </v-tab-item>
+      <!-- custom editor(s) here -->
+      <slot name="custom-tab-items" v-bind:value="value"></slot>
 
       <v-tab-item value="tabMonaco">
         <v-card flat tile>
           <monaco-editor
             ref="monaco"
-            class="monaco fill-height"
+            class="fill-height"
             v-model="compCode"
             :options="monacoOptions"
             :amdRequire="amdRequire"

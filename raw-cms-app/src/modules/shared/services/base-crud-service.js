@@ -13,13 +13,20 @@ export class BaseCrudService extends ICrudService {
   }
 
   async getAll() {
-    throw new Error('To be implemented. This should return all values.');
+    const res = await this.getPage({ size: Number.MAX_VALUE });
+    return res.items;
   }
 
-  async getPage({ page = 0 } = {}) {
-    // FIXME: Handle pagination (maybe in api client?)
-    const res = await this._apiClient.get(this._basePath);
-    return res.data.data.items;
+  async getPage({ page = 1, size = 20, rawQuery = undefined, sort = undefined } = {}) {
+    const config = { pageSize: size, pageNumber: page };
+    if (rawQuery) {
+      config.rawQuery = rawQuery;
+    }
+    if (sort) {
+      config.sort = JSON.stringify(sort);
+    }
+    const res = await this._apiClient.get(this._basePath, { params: config });
+    return res.data.data;
   }
 
   async getById(id) {
@@ -29,6 +36,11 @@ export class BaseCrudService extends ICrudService {
     }
 
     const res = await this._apiClient.get(`${this._basePath}/${id}`);
+
+    if (!this._checkGenericError(res)) {
+      return false;
+    }
+
     return res.data.data;
   }
 
@@ -41,7 +53,7 @@ export class BaseCrudService extends ICrudService {
     }
 
     const res = await this._apiClient.post(`${this._basePath}`, obj);
-    return res.data.data === true;
+    return this._checkGenericError(res);
   }
 
   async update(obj) {
@@ -53,7 +65,7 @@ export class BaseCrudService extends ICrudService {
     }
 
     const res = await this._apiClient.patch(`${this._basePath}/${id}`, obj);
-    return res.data.data === true;
+    return this._checkGenericError(res);
   }
 
   async delete(id) {
@@ -63,6 +75,14 @@ export class BaseCrudService extends ICrudService {
     }
 
     const res = await this._apiClient.delete(`${this._basePath}/${id}`);
-    return res.data.data === true;
+    return this._checkGenericError(res);
+  }
+
+  _checkGenericError(axiosRes) {
+    if (axiosRes.status !== 200) {
+      return false;
+    }
+
+    return true;
   }
 }

@@ -1,6 +1,6 @@
 import { i18nHelper } from '../config/i18n.js';
 import { loginService } from '../modules/core/services/login.service.js';
-import { Login } from '../modules/core/views/login/login.js';
+import { LoginView } from '../modules/core/views/login-view/login-view.js';
 import { optionalChain } from '../utils/object.utils.js';
 
 const _router = new VueRouter({
@@ -9,7 +9,7 @@ const _router = new VueRouter({
     {
       path: '/login',
       name: 'login',
-      component: async (res, rej) => await Login(res, rej),
+      component: async (res, rej) => await LoginView(res, rej),
       meta: {
         requiresAuth: false,
       },
@@ -52,9 +52,51 @@ const _router = new VueRouter({
       ],
     },
     {
+      path: '/collections',
+      component: async (res, rej) => {
+        const cmp = await import('/modules/core/views/collections-view/collections-view.js');
+        await cmp.default(res, rej);
+      },
+      children: [
+        {
+          path: '/',
+          name: 'collections',
+          component: async (res, rej) => {
+            const cmp = await import(
+              '/modules/core/views/collections-list-view/collections-list-view.js'
+            );
+            await cmp.default(res, rej);
+          },
+        },
+        {
+          path: ':collName',
+          name: 'collection-table',
+          component: async (res, rej) => {
+            const cmp = await import(
+              '/modules/core/views/collection-table-view/collection-table-view.js'
+            );
+            await cmp.default(res, rej);
+          },
+        },
+        {
+          path: ':collName/:id',
+          name: 'collection-details',
+          component: async (res, rej) => {
+            const cmp = await import(
+              '/modules/core/views/collection-item-details-view/collection-item-details-view.js'
+            );
+            await cmp.default(res, rej);
+          },
+        },
+      ],
+      meta: {
+        i18nLoad: ['core', 'formly-material'],
+      },
+    },
+    {
       path: '/users',
       component: async (res, rej) => {
-        const cmp = await import('/modules/core/views/users/users.js');
+        const cmp = await import('/modules/core/views/users-view/users-view.js');
         await cmp.default(res, rej);
       },
       children: [
@@ -62,7 +104,7 @@ const _router = new VueRouter({
           path: '/',
           name: 'users',
           component: async (res, rej) => {
-            const cmp = await import('/modules/core/components/users-list/users-list.js');
+            const cmp = await import('/modules/core/views/users-list-view/users-list-view.js');
             await cmp.default(res, rej);
           },
         },
@@ -70,33 +112,67 @@ const _router = new VueRouter({
           path: ':id',
           name: 'user-details',
           component: async (res, rej) => {
-            const cmp = await import('/modules/core/components/user-details/user-details.js');
+            const cmp = await import('/modules/core/views/user-details-view/user-details-view.js');
             await cmp.default(res, rej);
           },
         },
       ],
     },
     {
-      path: '/lambda',
+      path: '/lambdas',
       component: async (res, rej) => {
-        const cmp = await import('/modules/core/views/lambdas/lambdas.js');
+        const cmp = await import('/modules/core/views/lambdas-view/lambdas-view.js');
         await cmp.default(res, rej);
       },
       children: [
         {
           path: '/',
-          name: 'lambda-list',
+          name: 'lambdas',
           component: async (res, rej) => {
-            const cmp = await import('/modules/core/components/lambda-list/lambda-list.js');
+            const cmp = await import('/modules/core/views/lambdas-list-view/lambdas-list-view.js');
             await cmp.default(res, rej);
           },
         },
         {
-          path: '/lambda/editor/:id',
-          name: 'lambda-editor',
+          path: ':id',
+          name: 'lambda-details',
           component: async (res, rej) => {
-            const cmp = await import('/modules/core/components/lambda-editor/lambda-editor.js');
+            const cmp = await import(
+              '/modules/core/views/lambda-details-view/lambda-details-view.js'
+            );
             await cmp.default(res, rej);
+          },
+        },
+      ],
+    },
+    {
+      path: '/sandbox',
+      component: {
+        template: `<router-view></router-view>`,
+      },
+      children: [
+        {
+          path: '/',
+          name: 'sandbox',
+          component: {
+            template: `
+            <v-container>
+              <ul>
+                <li><router-link :to="{ name: 'sandbox-formly' }">Formly</router-link></li>
+              </ul>
+            </v-container>
+            `,
+          },
+        },
+        {
+          path: 'formly',
+          name: 'sandbox-formly',
+          component: async (res, rej) => {
+            const cmp = await import('/modules/core/views/sandbox/formly-test/formly-test.js');
+            await cmp.default(res, rej);
+          },
+          meta: {
+            i18nLoad: ['core', 'formly-material'],
           },
         },
       ],
@@ -106,7 +182,22 @@ const _router = new VueRouter({
 
 // Automatically load i18n messages
 _router.beforeEach(async (to, from, next) => {
-  await i18nHelper.load('en', '/modules/core/assets/i18n/i18n.en.json');
+  if (!optionalChain(() => to.matched)) {
+    next();
+    return;
+  }
+
+  let i18nModulesToLoad = to.matched
+    .map(r =>
+      optionalChain(() => r.meta.i18nLoad, { fallbackValue: ['core'], replaceLastUndefined: true })
+    )
+    .reduce((acc, val) => [...acc, ...val], []);
+  i18nModulesToLoad = [...new Set(i18nModulesToLoad)];
+
+  for (const mod of i18nModulesToLoad) {
+    await i18nHelper.load('en', `/modules/${mod}/assets/i18n/i18n.en.json`);
+  }
+
   next();
 });
 

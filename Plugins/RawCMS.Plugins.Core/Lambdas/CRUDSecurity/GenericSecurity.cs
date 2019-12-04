@@ -9,8 +9,6 @@
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
 using RawCMS.Library.Core;
-using RawCMS.Library.Lambdas;
-using RawCMS.Library.Schema;
 using RawCMS.Library.Service;
 using RawCMS.Plugins.Core.Model;
 using System;
@@ -20,14 +18,22 @@ namespace RawCMS.Plugins.Core.Lambdas.CRUDSecurity
 {
     public abstract class GenericSecurity : DataProcessLambda
     {
-        private readonly CRUDService service;
         private readonly IHttpContextAccessor _httpContextAccessor;
+
+        protected readonly EntityService entityService;
+
+        public GenericSecurity(EntityService entityService, IHttpContextAccessor httpContextAccessor)
+        {
+            _httpContextAccessor = httpContextAccessor;
+            this.entityService = entityService;
+        }
 
         public void CheckGeneric(string collection, DataOperation operation)
         {
-            if (EntityValidation.Entities.TryGetValue(collection, out CollectionSchema current))
+            var settings = this.entityService.GetByName(collection);
+            if (settings != null)
             {
-                if (current.PluginConfiguration.TryGetValue("Security", out JObject jObject))
+                if (settings.PluginConfiguration.TryGetValue("Security", out JObject jObject))
                 {
                     CollectionSecurityInfo secinfo = jObject.ToObject<CollectionSecurityInfo>();
                     if (secinfo.AllowedRoleMap != null)
@@ -46,12 +52,6 @@ namespace RawCMS.Plugins.Core.Lambdas.CRUDSecurity
                     }
                 }
             }
-        }
-
-        public GenericSecurity(CRUDService service, IHttpContextAccessor httpContextAccessor)
-        {
-            _httpContextAccessor = httpContextAccessor;
-            this.service = service;
         }
     }
 }

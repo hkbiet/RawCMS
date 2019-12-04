@@ -1,64 +1,48 @@
-<detail-wrapper v-on="$listeners" v-bind="$props">
-  <template v-slot:custom>
-    <h1>main edit</h1>
-  </template>
+<detail-wrapper v-on="$listeners" v-bind="$props" class="rawcms-entity-details">
+  <template slot="custom-tabs">
+    <link rel="stylesheet" href="/modules/core/components/entity-details/entity-details.css" />
 
-  <template v-slot:custom2>
-    <v-tab href="#script">
-      Script
-      <v-icon>mdi-pen</v-icon>
-    </v-tab>
-
-    <v-tab href="#fieldEdit">
-      Field Edit
+    <v-tab href="#tabFormly">
+      {{ $t('core.common.editText') }}
       <v-icon>mdi-pen</v-icon>
     </v-tab>
   </template>
 
-  <template v-slot:custom3>
-    <v-tab-item value="script">
+  <template v-slot:custom-tab-items="{ value }">
+    <v-tab-item value="tabFormly">
       <v-card flat tile>
-        <v-tabs class="elevation-2" dark vertical="vertical">
-          <v-tabs-slider></v-tabs-slider>
+        <v-list class="elevation-1">
+          <v-list-item
+            v-for="i of value.FieldSettings"
+            :key="i.Name"
+            @click.stop="showFieldDialog(i)"
+          >
+            <v-list-item-content>
+              <v-list-item-title>{{ i.Name }}</v-list-item-title>
+            </v-list-item-content>
+            <v-list-item-icon>
+              <v-btn icon @click.stop="showFieldDialog(i)">
+                <v-icon>mdi-pencil-outline</v-icon>
+              </v-btn>
+              <v-btn icon @click.stop="removeField(i)">
+                <v-icon>mdi-delete-outline</v-icon>
+              </v-btn>
+            </v-list-item-icon>
+          </v-list-item>
 
-          <v-tab href="#tab-1">
-            PreSave
-          </v-tab>
+          <v-list-item @click.stop="showFieldDialog()">
+            <v-list-item-content>
+              <v-list-item-title>Add new field</v-list-item-title>
+            </v-list-item-content>
+            <v-list-item-icon>
+              <v-icon>mdi-plus</v-icon>
+            </v-list-item-icon>
+          </v-list-item>
+        </v-list>
 
-          <v-tab href="#tab-2">
-            Delete
-          </v-tab>
-
-          <v-tab-item value="tab-1">
-            <v-card flat tile>
-              <monaco-editor
-                ref="monaco"
-                class="monaco fill-height"
-                language="javascript"
-                style="width:900px;height:600px;"
-                :amdRequire="amdRequire"
-              ></monaco-editor>
-            </v-card>
-          </v-tab-item>
-
-          <v-tab-item value="tab-2">
-            <v-card flat tile>
-              <monaco-editor
-                ref="monaco"
-                class="monaco fill-height"
-                language="javascript"
-                style="width:900px;height:600px;"
-                :amdRequire="amdRequire"
-              ></monaco-editor>
-            </v-card>
-          </v-tab-item>
-        </v-tabs>
-      </v-card>
-    </v-tab-item>
-
-    <v-tab-item value="fieldEdit">
-      <v-card flat tile>
-        <list-wrapper></list-wrapper>
+        <v-dialog persistent v-model="isFieldDialogVisible">
+          <field-edit :field="currentFieldCopy" @closed="onFieldEdited(value, $event)"></field-edit>
+        </v-dialog>
       </v-card>
     </v-tab-item>
   </template>

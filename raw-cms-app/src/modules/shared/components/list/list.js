@@ -1,5 +1,5 @@
 import { epicSpinners } from '../../../../utils/spinners.js';
-import { snackbarService } from '../../../core/services/snackbar-service.js';
+import { snackbarService } from '../../../core/services/snackbar.service.js';
 import { BaseCrudService } from '../../../shared/services/base-crud-service.js';
 
 const _rawCmsListEvents = {
@@ -36,19 +36,19 @@ const _RawCmsListDef = async () => {
       fetchData: async function() {
         // FIXME: Pagination
         const res = await this.apiService.getPage();
-        this.items = res.map(x => {
+        this.items = res.items.map(x => {
           return { ...x, _meta_: { isDeleting: false } };
         });
         this.isLoading = false;
         this.$emit(_rawCmsListEvents.pageLoaded, { hasItems: this.items.length > 0 });
       },
-      goTo: function(id) {
+      goTo: function(item) {
         if (!this.detailRouteName) {
           console.warn('"detailRouteName" prop was not defined, cannot go to detail view.');
           return;
         }
 
-        this.$router.push({ name: this.detailRouteName, params: { id: id } });
+        this.$router.push({ name: this.detailRouteName, params: { id: item._id } });
       },
       showDeleteConfirm: function(item) {
         this.currentItem = item;

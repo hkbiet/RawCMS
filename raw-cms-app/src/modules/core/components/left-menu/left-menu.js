@@ -16,7 +16,7 @@ const _LeftMenu = async (resolve, reject) => {
     },
     computed: {
       userinfo: function() {
-        return vuexStore.state.core.userInfo;
+        return vuexStore.state.core.userInfo || {};
       },
     },
     data: () => {
@@ -26,7 +26,8 @@ const _LeftMenu = async (resolve, reject) => {
         items: [
           { icon: 'mdi-account', text: 'Users', route: 'users' },
           { icon: 'mdi-cube', text: 'Entities', route: 'entities' },
-          { icon: 'mdi-circle', text: 'Lambdas', route: 'lambda-list' },
+          { icon: 'mdi-book-open', text: 'Collections', route: 'collections' },
+          { icon: 'mdi-circle', text: 'Lambdas', route: 'lambdas' },
         ],
       };
     },

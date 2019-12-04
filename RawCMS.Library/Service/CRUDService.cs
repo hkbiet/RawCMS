@@ -171,7 +171,7 @@ namespace RawCMS.Library.Service
             }
             var fullSaved = Get(collection, id);
             InvokeProcess(collection, ref fullSaved, SavePipelineStage.PostSave, DataOperation.Write, dataContext);
-            return JObject.Parse(fullSaved.ToJson(js));
+            return fullSaved;
         }
 
         public void EnsureCollection(string collection)
@@ -255,6 +255,26 @@ namespace RawCMS.Library.Service
                 .GetCollection<BsonDocument>(collection).Find<BsonDocument>(filter)
                 .Skip((query.PageNumber - 1) * query.PageSize)
                 .Limit(query.PageSize);
+
+            if (query.Sort != null)
+            {
+                var sort = new SortDefinitionBuilder<BsonDocument>();
+                SortDefinition<BsonDocument> sortDef = null;
+                foreach (var sortable in query.Sort)
+                {
+                    FieldDefinition<BsonDocument> field = sortable.Field;
+
+                    if (sortable.Ascending)
+                    {
+                        sortDef = (sortDef == null) ? sort.Ascending(field) : sortDef.Ascending(field);
+                    }
+                    else
+                    {
+                        sortDef = (sortDef == null) ? sort.Descending(field) : sortDef.Descending(field);
+                    }
+                }
+                results = results.Sort(sortDef);
+            }
 
             long count = Count(collection, filter);
 
