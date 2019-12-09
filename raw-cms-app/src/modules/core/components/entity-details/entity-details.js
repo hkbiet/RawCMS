@@ -7,7 +7,7 @@ const _EntityDetailsWrapperDef = async () => {
   const rawCmsDetailEditDef = await RawCmsDetailEditDef();
 
   return {
-    data: function() {
+    data: function () {
       return {
         activeTabId: 'tabFormly',
         apiService: entitiesSchemaService,
@@ -29,20 +29,20 @@ const _EntityDetailsDef = async () => {
       DetailWrapper: detailWrapperDef,
       FieldEdit: fieldEditDef,
     },
-    data: function() {
+    data: function () {
       return {
         currentFieldCopy: null,
         isFieldDialogVisible: false,
       };
     },
     methods: {
-      addNewField: function() {
+      addNewField: function () {
         console.log('TODO');
       },
-      dismissFieldDialog: function() {
+      dismissFieldDialog: function () {
         this.isFieldDialogVisible = false;
       },
-      onFieldEdited: function(entity, evt) {
+      onFieldEdited: function (entity, evt) {
         this.dismissFieldDialog();
 
         if (!evt.isOk) {
@@ -57,15 +57,22 @@ const _EntityDetailsDef = async () => {
           entity.FieldSettings.push(evt.field);
         }
       },
-      removeField: function(field) {
+      removeField: function (field) {
         // FIXME: entity.FieldSettings = entity.FieldSettings.filter(x => x.Name !== field.Name);
       },
-      showFieldDialog: function(field = {}) {
+      showFieldDialog: function (field = {}) {
         this.currentFieldCopy = deepClone(field);
         this.isFieldDialogVisible = true;
       },
     },
-    props: detailWrapperDef.extends.props,
+    props: Vue.extend(detailWrapperDef.extends.props, {
+      monacoScriptOptions: {
+        language: 'javascript',
+        scrollBeyondLastLine: false,
+      },
+    }),
+    methods: detailWrapperDef.extends.methods,
+
     template: tpl,
   };
 };

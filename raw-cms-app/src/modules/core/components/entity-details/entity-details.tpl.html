@@ -6,17 +6,21 @@
       {{ $t('core.common.editText') }}
       <v-icon>mdi-pen</v-icon>
     </v-tab>
+
+    <v-tab href="#tabCustom1">
+      {{ $t('core.common.editScript') }}
+      <v-icon>mdi-language-javascript</v-icon>
+    </v-tab>
   </template>
+
+
+
 
   <template v-slot:custom-tab-items="{ value }">
     <v-tab-item value="tabFormly">
       <v-card flat tile>
         <v-list class="elevation-1">
-          <v-list-item
-            v-for="i of value.FieldSettings"
-            :key="i.Name"
-            @click.stop="showFieldDialog(i)"
-          >
+          <v-list-item v-for="i of value.FieldSettings" :key="i.Name" @click.stop="showFieldDialog(i)">
             <v-list-item-content>
               <v-list-item-title>{{ i.Name }}</v-list-item-title>
             </v-list-item-content>
@@ -43,6 +47,26 @@
         <v-dialog persistent v-model="isFieldDialogVisible">
           <field-edit :field="currentFieldCopy" @closed="onFieldEdited(value, $event)"></field-edit>
         </v-dialog>
+      </v-card>
+    </v-tab-item>
+
+    <v-tab-item value="tabCustom1">
+      <v-card flat tile>
+        <v-tabs class="elevation-2" dark vertical="vertical">
+          <v-tabs-slider></v-tabs-slider>
+
+          <v-tab href="#tab-1">
+            PreSave
+          </v-tab>
+
+          <v-tab-item value="tab-1">
+            <v-card flat tile>
+              <monaco-editor ref="monaco" v-model="value" class="monaco fill-height" language="javascript"
+                style="width:900px;height:600px;" :amdRequire="amdRequire" @editorDidMount="resizeMonaco()">
+              </monaco-editor>
+            </v-card>
+          </v-tab-item>
+        </v-tabs>
       </v-card>
     </v-tab-item>
   </template>

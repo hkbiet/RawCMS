@@ -18,22 +18,22 @@ const _RawCmsDetailEditDef = async () => {
     },
     computed: {
       compCode: {
-        get: function() {
+        get: function () {
           return this.code;
         },
-        set: function(newValue) {
+        set: function (newValue) {
           this.code = newValue;
 
           try {
             this.value = JSON.parse(newValue);
-          } catch (e) {}
+          } catch (e) { }
         },
       },
-      isNew: function() {
+      isNew: function () {
         return this.$route.params.id === 'new';
       },
     },
-    created: async function() {
+    created: async function () {
       if (!this.isNew) {
         await this.fetchData();
       }
@@ -45,7 +45,7 @@ const _RawCmsDetailEditDef = async () => {
         value: this.value,
       });
     },
-    data: function() {
+    data: function () {
       return {
         apiService: this.apiBasePath ? new BaseCrudService({ basePath: this.apiBasePath }) : null,
         activeTabId: 'tabMonaco',
@@ -61,20 +61,20 @@ const _RawCmsDetailEditDef = async () => {
     },
     methods: {
       amdRequire: require,
-      saveSuccessMsg: function(item) {
+      saveSuccessMsg: function (item) {
         return this.$t('core.common.saveSuccessMsgTpl');
       },
-      saveErrorMsg: function(item) {
+      saveErrorMsg: function (item) {
         return this.$t('core.common.saveErrorMsgTpl');
       },
-      fetchData: async function() {
+      fetchData: async function () {
         const id = this.$route.params.id;
         this.value = await this.apiService.getById(id);
       },
-      formatJson: function() {
+      formatJson: function () {
         return JSON.stringify(this.value, null, 4);
       },
-      resizeMonaco: function() {
+      resizeMonaco: function () {
         const monacoEditor = this.$refs.monaco.getMonaco();
         const oldLayout = monacoEditor.getLayoutInfo();
         const newHeight =
@@ -82,7 +82,7 @@ const _RawCmsDetailEditDef = async () => {
           this.$refs.tabMonacoRef.$el.getBoundingClientRect().height;
         monacoEditor.layout({ width: oldLayout.width, height: newHeight });
       },
-      save: async function() {
+      save: async function () {
         this.isSaving = true;
         const apiCall = this.isNew
           ? this.apiService.create(this.value)
@@ -111,7 +111,7 @@ const _RawCmsDetailEditDef = async () => {
     watch: {
       $route: 'fetchData',
       value: {
-        handler: function(val) {
+        handler: function (val) {
           this.code = this.formatJson(val || {});
         },
         deep: true,
